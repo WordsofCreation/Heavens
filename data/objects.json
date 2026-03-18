@@ -6,7 +6,7 @@
     "type": "G-type main-sequence star",
     "constellation": "Not placed in a night-sky constellation from Earth",
     "distance": "1 AU",
-    "distanceLightYears": 0.000016,
+    "distanceLightYears": 1.6e-05,
     "spectralClass": "G2V",
     "color": "Warm white with a soft yellow cast from Earth's atmosphere",
     "apparentMagnitude": -26.74,
@@ -19,7 +19,36 @@
       "Its light takes a little over 8 minutes to reach Earth.",
       "The Sun converts hydrogen into helium in its core through nuclear fusion.",
       "Sunspots and flares reveal the power of stellar magnetic fields."
-    ]
+    ],
+    "ra": "00 00 00",
+    "dec": "+00 00 00",
+    "aladinTarget": "Sun",
+    "ier": "solar-system",
+    "observedThroughLight": {
+      "colorTemperature": "Its near-white light peaks around a surface temperature of about 5,800 K, but Earth's atmosphere can tint it yellow or orange near the horizon.",
+      "spectralInfo": "Dark absorption lines in sunlight act like a laboratory reference for stellar chemistry and magnetic activity.",
+      "brightnessDistance": "The Sun overwhelms our sky because it is only 1 AU away, not because it is the most luminous star in the galaxy.",
+      "motionComposition": "Oscillations, magnetic storms, and solar wind reveal how plasma moves while hydrogen and helium dominate its composition."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Sun to explore its position in Not placed in a night-sky constellation from Earth and compare the science story in its light with nearby sky context."
   },
   {
     "id": "sirius",
@@ -41,7 +70,35 @@
       "It is part of a binary system with the white dwarf Sirius B.",
       "Atmospheric turbulence often makes it flash in many colors near the horizon.",
       "Its brightness made it important in many cultural sky traditions."
-    ]
+    ],
+    "ra": "06 45 08.9",
+    "dec": "-16 42 58",
+    "aladinTarget": "Sirius",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Sirius to explore its position in Canis Major and compare the science story in its light with nearby sky context."
   },
   {
     "id": "betelgeuse",
@@ -63,7 +120,35 @@
       "It is one of the shoulder stars of Orion.",
       "Its brightness noticeably changes over time.",
       "Astronomers have directly imaged its enormous extended atmosphere."
-    ]
+    ],
+    "ra": "05 55 10.3",
+    "dec": "+07 24 25",
+    "aladinTarget": "Betelgeuse",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Betelgeuse to explore its position in Orion and compare the science story in its light with nearby sky context."
   },
   {
     "id": "rigel",
@@ -85,7 +170,35 @@
       "It marks Orion's foot in many sky charts.",
       "Rigel is actually part of a multiple-star system.",
       "Its ultraviolet output is far stronger than the Sun's."
-    ]
+    ],
+    "ra": "05 14 32.3",
+    "dec": "-08 12 06",
+    "aladinTarget": "Rigel",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Rigel to explore its position in Orion and compare the science story in its light with nearby sky context."
   },
   {
     "id": "polaris",
@@ -107,7 +220,35 @@
       "It is not the brightest star in the sky, but it is easy to locate from the Big Dipper.",
       "Its position in the sky changes only slightly through the night.",
       "Earth's axial precession means different pole stars appear over millennia."
-    ]
+    ],
+    "ra": "02 31 49.1",
+    "dec": "+89 15 51",
+    "aladinTarget": "Polaris",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Polaris to explore its position in Ursa Minor and compare the science story in its light with nearby sky context."
   },
   {
     "id": "vega",
@@ -129,7 +270,35 @@
       "Vega was once close to the north celestial pole thousands of years ago.",
       "It rotates rapidly, causing its shape to bulge at the equator.",
       "A debris disk surrounds the star."
-    ]
+    ],
+    "ra": "18 36 56.3",
+    "dec": "+38 47 01",
+    "aladinTarget": "Vega",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Vega to explore its position in Lyra and compare the science story in its light with nearby sky context."
   },
   {
     "id": "deneb",
@@ -151,7 +320,35 @@
       "It forms the Summer Triangle with Vega and Altair.",
       "Deneb drives a strong stellar wind.",
       "Its distance estimates have long been an interesting observational challenge."
-    ]
+    ],
+    "ra": "20 41 25.9",
+    "dec": "+45 16 49",
+    "aladinTarget": "Deneb",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Deneb to explore its position in Cygnus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "altair",
@@ -173,7 +370,35 @@
       "It is one of the closest bright stars visible to the naked eye.",
       "Altair completes a rotation in only a matter of hours.",
       "Its poles are hotter than its equator because of rapid spin."
-    ]
+    ],
+    "ra": "19 50 47.0",
+    "dec": "+08 52 06",
+    "aladinTarget": "Altair",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Altair to explore its position in Aquila and compare the science story in its light with nearby sky context."
   },
   {
     "id": "proxima-centauri",
@@ -195,7 +420,27 @@
       "It belongs to the Alpha Centauri system.",
       "Red dwarfs can burn fuel very slowly for enormous spans of time.",
       "Stellar flares may strongly affect nearby planets."
-    ]
+    ],
+    "ra": "14 29 42.9",
+    "dec": "-62 40 46",
+    "aladinTarget": "Proxima Centauri",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Proxima Centauri to explore its position in Centaurus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "alpha-centauri-a",
@@ -217,7 +462,27 @@
       "It forms a close binary pair with Alpha Centauri B.",
       "The pair orbit each other over about 80 years.",
       "From the southern hemisphere it is a striking naked-eye object."
-    ]
+    ],
+    "ra": "14 39 36.5",
+    "dec": "-60 50 02",
+    "aladinTarget": "Alpha Centauri",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Alpha Centauri A to explore its position in Centaurus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "alpha-centauri-b",
@@ -239,7 +504,27 @@
       "It is often discussed in exoplanet studies because of its proximity.",
       "K-type stars can offer long-lived stable energy output.",
       "Its color is noticeably warmer than many bright white stars."
-    ]
+    ],
+    "ra": "14 39 35.1",
+    "dec": "-60 50 14",
+    "aladinTarget": "Alpha Centauri B",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Alpha Centauri B to explore its position in Centaurus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "aldebaran",
@@ -261,7 +546,35 @@
       "It appears near the Hyades star cluster from our viewpoint, though it is not actually part of that cluster.",
       "Its name has long been associated with the bright eye of the Bull.",
       "It is large enough that its diameter has been measured directly."
-    ]
+    ],
+    "ra": "04 35 55.2",
+    "dec": "+16 30 33",
+    "aladinTarget": "Aldebaran",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Aldebaran to explore its position in Taurus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "antares",
@@ -283,14 +596,42 @@
       "The name reflects its color contrast with Mars.",
       "It has a hot blue companion star.",
       "Its outer layers are thin and extended compared with the Sun's compact photosphere."
-    ]
+    ],
+    "ra": "16 29 24.4",
+    "dec": "-26 25 55",
+    "aladinTarget": "Antares",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Antares to explore its position in Scorpius and compare the science story in its light with nearby sky context."
   },
   {
     "id": "arcturus",
     "name": "Arcturus",
     "category": "Stars",
     "type": "Orange giant",
-    "constellation": "Boötes",
+    "constellation": "Bo\u00f6tes",
     "distance": "36.7 light-years",
     "distanceLightYears": 36.7,
     "spectralClass": "K1.5 III",
@@ -305,7 +646,35 @@
       "Its high motion through space was measured long before the modern space age.",
       "It is among the brightest stars visible from Earth.",
       "The phrase 'arc to Arcturus' is a popular guide for locating it from the Big Dipper."
-    ]
+    ],
+    "ra": "14 15 39.7",
+    "dec": "+19 10 57",
+    "aladinTarget": "Arcturus",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Arcturus to explore its position in Bo\u00f6tes and compare the science story in its light with nearby sky context."
   },
   {
     "id": "spica",
@@ -327,7 +696,35 @@
       "It is one of the stars along the classic spring star-hopping arc from the Big Dipper.",
       "The pair are so close that their shapes are distorted by gravity.",
       "Its light is much more energetic than the Sun's."
-    ]
+    ],
+    "ra": "13 25 11.6",
+    "dec": "-11 09 41",
+    "aladinTarget": "Spica",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Spica to explore its position in Virgo and compare the science story in its light with nearby sky context."
   },
   {
     "id": "capella",
@@ -349,7 +746,35 @@
       "It is one of the brightest stars in the northern sky.",
       "The main pair are giant stars that have left the main sequence.",
       "Additional faint companions make the system even richer."
-    ]
+    ],
+    "ra": "05 16 41.4",
+    "dec": "+45 59 53",
+    "aladinTarget": "Capella",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Capella to explore its position in Auriga and compare the science story in its light with nearby sky context."
   },
   {
     "id": "bellatrix",
@@ -371,7 +796,35 @@
       "Its name has been translated as a female warrior in the sky.",
       "It is a hot luminous giant rather than a main-sequence star.",
       "Bellatrix and Betelgeuse together make Orion a natural color-temperature classroom."
-    ]
+    ],
+    "ra": "05 25 07.9",
+    "dec": "+06 20 59",
+    "aladinTarget": "Bellatrix",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Bellatrix to explore its position in Orion and compare the science story in its light with nearby sky context."
   },
   {
     "id": "canopus",
@@ -393,7 +846,35 @@
       "It was historically important in navigation.",
       "Spacecraft have used Canopus for attitude references.",
       "Its true luminosity is far greater than the Sun's."
-    ]
+    ],
+    "ra": "06 23 57.1",
+    "dec": "-52 41 44",
+    "aladinTarget": "Canopus",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Canopus to explore its position in Carina and compare the science story in its light with nearby sky context."
   },
   {
     "id": "barnards-star",
@@ -415,7 +896,27 @@
       "It has the largest known proper motion of any star relative to the Sun.",
       "It is invisible to the unaided eye.",
       "Red dwarfs like this may be the most common stars in the Milky Way."
-    ]
+    ],
+    "ra": "17 57 48.5",
+    "dec": "+04 41 36",
+    "aladinTarget": "Barnard's Star",
+    "observedThroughLight": {
+      "colorTemperature": "Its color gives a first clue to surface temperature: bluer stars are hotter, while redder stars are cooler.",
+      "spectralInfo": "Its spectrum contains patterns that help astronomers estimate temperature, pressure, and which elements are present in the outer layers.",
+      "brightnessDistance": "Apparent brightness mixes true energy output with distance, so a modest-looking star can still be tremendously luminous.",
+      "motionComposition": "Tiny wavelength shifts can reveal motion, while absorption lines show common stellar ingredients such as hydrogen, helium, and heavier elements."
+    },
+    "scienceCards": [
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Barnard's Star to explore its position in Ophiuchus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "orion-nebula",
@@ -437,7 +938,35 @@
       "It is visible to the naked eye in Orion's sword.",
       "Young stars inside it are still forming from collapsing gas.",
       "The Trapezium cluster helps illuminate the nebula."
-    ]
+    ],
+    "ra": "05 35 17.3",
+    "dec": "-05 23 28",
+    "aladinTarget": "M 42",
+    "observedThroughLight": {
+      "colorTemperature": "Nebula colors often come from glowing gas and scattered starlight rather than from a single hot surface.",
+      "spectralInfo": "Emission lines from hydrogen, oxygen, and sulfur show which gases are energized inside the cloud.",
+      "brightnessDistance": "These clouds can look faint because their light is spread across a large area and often filtered by dust between us and the object.",
+      "motionComposition": "Spectra reveal expanding gas, newborn stars, and the mix of atoms and dust grains that shape future star formation."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Orion Nebula to explore its position in Orion and compare the science story in its light with nearby sky context."
   },
   {
     "id": "pleiades",
@@ -459,7 +988,35 @@
       "It is often called the Seven Sisters.",
       "The cluster is much younger than the Sun.",
       "Binoculars reveal many more members than the naked eye."
-    ]
+    ],
+    "ra": "03 47 24",
+    "dec": "+24 07 00",
+    "aladinTarget": "M 45",
+    "observedThroughLight": {
+      "colorTemperature": "A star cluster lets astronomers compare many stellar colors at once, revealing a family of stars born from similar material.",
+      "spectralInfo": "The combined light helps astronomers estimate age because hotter, shorter-lived stars disappear first from the cluster's main sequence.",
+      "brightnessDistance": "Clusters look compact because many stars sit at nearly the same distance, making them excellent distance and evolution benchmarks.",
+      "motionComposition": "Shared motion across the sky helps confirm membership, while similar chemical fingerprints show a common birthplace."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Pleiades to explore its position in Taurus and compare the science story in its light with nearby sky context."
   },
   {
     "id": "andromeda-galaxy",
@@ -481,7 +1038,27 @@
       "The Milky Way and Andromeda are moving toward each other.",
       "Its disk is much larger on the sky than many observers realize.",
       "Dark skies are essential for a good naked-eye view."
-    ]
+    ],
+    "ra": "00 42 44.3",
+    "dec": "+41 16 09",
+    "aladinTarget": "M 31",
+    "observedThroughLight": {
+      "colorTemperature": "A galaxy's color blends billions of stars, so blue regions often flag young hot stars while redder zones trace older stellar populations or dust.",
+      "spectralInfo": "Galactic spectra combine starlight, gas clouds, and sometimes active central regions to show chemistry and star-formation history.",
+      "brightnessDistance": "Galaxies can appear dim simply because they are immense distances away, even when they contain hundreds of billions of stars.",
+      "motionComposition": "Line shifts reveal rotation and recession speed, while spectra show stars, gas, dust, and dark-matter-driven dynamics."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      }
+    ],
+    "skyGuide": "Center on Andromeda Galaxy to explore its position in Andromeda and compare the science story in its light with nearby sky context."
   },
   {
     "id": "sombrero-galaxy",
@@ -503,7 +1080,27 @@
       "Large telescopes reveal a remarkably sharp dust ring.",
       "It hosts a supermassive black hole at its center.",
       "Its edge-on angle makes structure easier to appreciate."
-    ]
+    ],
+    "ra": "12 39 59.4",
+    "dec": "-11 37 23",
+    "aladinTarget": "M 104",
+    "observedThroughLight": {
+      "colorTemperature": "A galaxy's color blends billions of stars, so blue regions often flag young hot stars while redder zones trace older stellar populations or dust.",
+      "spectralInfo": "Galactic spectra combine starlight, gas clouds, and sometimes active central regions to show chemistry and star-formation history.",
+      "brightnessDistance": "Galaxies can appear dim simply because they are immense distances away, even when they contain hundreds of billions of stars.",
+      "motionComposition": "Line shifts reveal rotation and recession speed, while spectra show stars, gas, dust, and dark-matter-driven dynamics."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      }
+    ],
+    "skyGuide": "Center on Sombrero Galaxy to explore its position in Virgo and compare the science story in its light with nearby sky context."
   },
   {
     "id": "eagle-nebula",
@@ -525,7 +1122,35 @@
       "The nebula contains an open cluster of young stars.",
       "Dense dusty knots inside the pillars may form additional stars.",
       "It is a popular target in astrophotography."
-    ]
+    ],
+    "ra": "18 18 48",
+    "dec": "-13 49 00",
+    "aladinTarget": "M 16",
+    "observedThroughLight": {
+      "colorTemperature": "Nebula colors often come from glowing gas and scattered starlight rather than from a single hot surface.",
+      "spectralInfo": "Emission lines from hydrogen, oxygen, and sulfur show which gases are energized inside the cloud.",
+      "brightnessDistance": "These clouds can look faint because their light is spread across a large area and often filtered by dust between us and the object.",
+      "motionComposition": "Spectra reveal expanding gas, newborn stars, and the mix of atoms and dust grains that shape future star formation."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Eagle Nebula to explore its position in Serpens and compare the science story in its light with nearby sky context."
   },
   {
     "id": "lagoon-nebula",
@@ -547,7 +1172,35 @@
       "It can be spotted from dark sites with binoculars.",
       "An embedded open cluster helps energize the gas.",
       "Its nickname comes from the dark lane that appears like a lagoon dividing the glow."
-    ]
+    ],
+    "ra": "18 03 37",
+    "dec": "-24 23 12",
+    "aladinTarget": "M 8",
+    "observedThroughLight": {
+      "colorTemperature": "Nebula colors often come from glowing gas and scattered starlight rather than from a single hot surface.",
+      "spectralInfo": "Emission lines from hydrogen, oxygen, and sulfur show which gases are energized inside the cloud.",
+      "brightnessDistance": "These clouds can look faint because their light is spread across a large area and often filtered by dust between us and the object.",
+      "motionComposition": "Spectra reveal expanding gas, newborn stars, and the mix of atoms and dust grains that shape future star formation."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Lagoon Nebula to explore its position in Sagittarius and compare the science story in its light with nearby sky context."
   },
   {
     "id": "trifid-nebula",
@@ -569,6 +1222,34 @@
       "Its name refers to the three-lobed appearance created by dark dust lanes.",
       "Blue regions reflect starlight rather than emit strongly on their own.",
       "It sits in a deep-sky-rich part of the Milky Way."
-    ]
+    ],
+    "ra": "18 02 23",
+    "dec": "-23 01 48",
+    "aladinTarget": "M 20",
+    "observedThroughLight": {
+      "colorTemperature": "Nebula colors often come from glowing gas and scattered starlight rather than from a single hot surface.",
+      "spectralInfo": "Emission lines from hydrogen, oxygen, and sulfur show which gases are energized inside the cloud.",
+      "brightnessDistance": "These clouds can look faint because their light is spread across a large area and often filtered by dust between us and the object.",
+      "motionComposition": "Spectra reveal expanding gas, newborn stars, and the mix of atoms and dust grains that shape future star formation."
+    },
+    "scienceCards": [
+      {
+        "title": "Why blue stars are hotter",
+        "body": "Hotter objects radiate more strongly at shorter wavelengths. That pushes a star's visible light toward white-blue tones, while cooler stars lean orange or red."
+      },
+      {
+        "title": "How spectra reveal chemistry",
+        "body": "Atoms absorb and emit only specific wavelengths. Match those spectral lines to laboratory measurements and you can identify the elements in distant objects."
+      },
+      {
+        "title": "Why apparent brightness is not true luminosity",
+        "body": "Brightness at Earth depends on both intrinsic power and distance. A dazzling nearby star can be less luminous than a remote supergiant that only appears moderate."
+      },
+      {
+        "title": "How distance changes what we see",
+        "body": "The farther light travels, the fainter and smaller an object appears. Distance can hide giant structures and make powerful objects seem subtle."
+      }
+    ],
+    "skyGuide": "Center on Trifid Nebula to explore its position in Sagittarius and compare the science story in its light with nearby sky context."
   }
 ]

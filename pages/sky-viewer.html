@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sky Viewer | Heavens</title>
+    <meta
+      name="description"
+      content="Explore the real sky with an integrated Aladin Lite viewer, object search, and science-rich context panels."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body data-page="sky-viewer">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="container nav-wrap">
+          <a class="brand" href="../index.html"><span class="brand-mark">✦</span><span class="brand-text">Heavens</span></a>
+          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button>
+          <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+            <a href="../index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="sky-viewer.html">Sky Viewer</a>
+            <a href="science-of-starlight.html">Science of Starlight</a>
+            <a href="star-life-cycles.html">Star Life Cycles</a>
+            <a href="about.html">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main-content" class="section page-intro-shell">
+        <section class="container page-intro reveal-on-scroll">
+          <p class="eyebrow">Sky Viewer</p>
+          <h1>Move from local object discovery to the real sky.</h1>
+          <p>
+            Sky Viewer layers Heavens' local astronomy catalog onto an embedded Aladin Lite map, so you can search for an object,
+            center the sky on it, and keep the surrounding science explanation close at hand.
+          </p>
+        </section>
+
+        <section class="container sky-viewer-layout reveal-on-scroll">
+          <aside class="sky-viewer-sidebar control-panel" aria-label="Sky Viewer controls">
+            <div>
+              <label for="sky-object-search">Search the sky catalog</label>
+              <input id="sky-object-search" type="search" placeholder="Search by object name, type, or constellation" />
+            </div>
+            <div class="sky-guidance" id="sky-guidance">
+              <p class="eyebrow">Start here</p>
+              <p>Pick a familiar star or nebula from the local dataset. The map will center on it and place a marker so you can orient yourself quickly.</p>
+            </div>
+            <div class="toggle-row">
+              <label class="toggle-chip"><input id="sky-grid-toggle" type="checkbox" /> <span>Show coordinate grid</span></label>
+            </div>
+            <div class="sky-search-results" id="sky-search-results" role="listbox" aria-label="Search results"></div>
+          </aside>
+
+          <section class="sky-viewer-main">
+            <div class="sky-viewer-frame">
+              <div class="sky-status-row">
+                <p class="results-count" id="sky-viewer-status">Loading interactive sky viewer…</p>
+                <a class="text-link" href="explore.html">Back to Explore</a>
+              </div>
+              <div id="aladin-lite-viewer" class="aladin-lite-shell" aria-label="Interactive sky viewer"></div>
+              <div class="sky-empty-state" id="sky-empty-state">
+                <h2>Choose a target to begin</h2>
+                <p>Your selected object will appear with a marker, local coordinates, and a science panel that stays useful even if live services are unavailable.</p>
+              </div>
+            </div>
+            <div id="sky-object-panel" class="sky-object-panel-shell" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <section class="container section reveal-on-scroll">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Science Explorer enhancements</p>
+              <h2>Reusable insights that connect the map to the science.</h2>
+            </div>
+            <p>These cards can be reused across object detail panels, educational pages, and future API-backed object summaries.</p>
+          </div>
+          <div class="science-insight-grid" id="science-insights-rail"></div>
+        </section>
+
+        <section class="container featured-home-grid reveal-on-scroll" id="featured-regions"></section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-grid">
+          <div>
+            <a class="brand brand-footer" href="../index.html">Heavens</a>
+            <p>Sky Viewer keeps the experience static-host friendly while opening the door to richer live astronomy data.</p>
+          </div>
+          <div>
+            <p class="footer-heading">Move between pages</p>
+            <ul>
+              <li><a href="explore.html">Explore</a></li>
+              <li><a href="science-of-starlight.html">Science of Starlight</a></li>
+              <li><a href="star-life-cycles.html">Star Life Cycles</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="footer-heading">Progressive enhancement</p>
+            <p>If Aladin Lite or future public integrations are unavailable, the local data model and science panels still provide a meaningful astronomy experience.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="../js/main.js"></script>
+  </body>
+</html>
