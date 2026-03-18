@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Sun",
+    "type": "star",
+    "constellation": "Not in a constellation from Earth's perspective",
+    "distance": "1 AU",
+    "spectralClass": "G2V",
+    "description": "Our local star is a medium-sized main sequence star whose energy supports nearly all life on Earth."
+  },
+  {
+    "name": "Sirius",
+    "type": "star",
+    "constellation": "Canis Major",
+    "distance": "8.6 light-years",
+    "spectralClass": "A1V",
+    "description": "Sirius is the brightest star in the night sky and shines with a crisp white-blue light."
+  },
+  {
+    "name": "Betelgeuse",
+    "type": "giant star",
+    "constellation": "Orion",
+    "distance": "~550 light-years",
+    "spectralClass": "M1-M2 Ia-Iab",
+    "description": "Betelgeuse is a red supergiant nearing the end of its life, famous for its size and warm reddish glow."
+  },
+  {
+    "name": "Rigel",
+    "type": "giant star",
+    "constellation": "Orion",
+    "distance": "~860 light-years",
+    "spectralClass": "B8 Ia",
+    "description": "Rigel is a luminous blue supergiant whose intense heat makes it one of Orion's standout stars."
+  },
+  {
+    "name": "Polaris",
+    "type": "variable star",
+    "constellation": "Ursa Minor",
+    "distance": "~433 light-years",
+    "spectralClass": "F7 Ib",
+    "description": "Known as the North Star, Polaris sits close to the north celestial pole and helps navigators find direction."
+  },
+  {
+    "name": "Vega",
+    "type": "star",
+    "constellation": "Lyra",
+    "distance": "25 light-years",
+    "spectralClass": "A0V",
+    "description": "Vega is a bright nearby star that once served as a key reference point for measuring stellar brightness."
+  },
+  {
+    "name": "Proxima Centauri",
+    "type": "star",
+    "constellation": "Centaurus",
+    "distance": "4.24 light-years",
+    "spectralClass": "M5.5Ve",
+    "description": "The closest known star to the Sun is a faint red dwarf with energetic flares and at least one intriguing exoplanet."
+  },
+  {
+    "name": "Aldebaran",
+    "type": "giant star",
+    "constellation": "Taurus",
+    "distance": "65 light-years",
+    "spectralClass": "K5 III",
+    "description": "Aldebaran appears as the eye of Taurus and is an orange giant star larger and cooler than the Sun."
+  },
+  {
+    "name": "Deneb",
+    "type": "giant star",
+    "constellation": "Cygnus",
+    "distance": "~2,600 light-years",
+    "spectralClass": "A2 Ia",
+    "description": "Deneb is a blue-white supergiant so luminous that it remains prominent despite its great distance."
+  },
+  {
+    "name": "Antares",
+    "type": "giant star",
+    "constellation": "Scorpius",
+    "distance": "~550 light-years",
+    "spectralClass": "M1.5 Iab-Ib",
+    "description": "Antares is a red supergiant with a fiery color that makes it one of the most recognizable stars of summer skies."
+  },
+  {
+    "name": "Orion Nebula",
+    "type": "nebula",
+    "constellation": "Orion",
+    "distance": "~1,344 light-years",
+    "spectralClass": "Not applicable",
+    "description": "The Orion Nebula is a stellar nursery where new stars are forming inside glowing gas and dust."
+  },
+  {
+    "name": "Andromeda Galaxy",
+    "type": "galaxy",
+    "constellation": "Andromeda",
+    "distance": "~2.5 million light-years",
+    "spectralClass": "Not applicable",
+    "description": "Our nearest large galactic neighbor contains hundreds of billions of stars and is visible to the naked eye in dark skies."
+  }
+]
