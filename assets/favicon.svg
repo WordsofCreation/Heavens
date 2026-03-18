@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Heavens star icon">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f0d28a" />
+      <stop offset="100%" stop-color="#87abff" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#050816" />
+  <path d="M32 10l4.8 14.2L51 29l-14.2 4.8L32 48l-4.8-14.2L13 29l14.2-4.8L32 10z" fill="url(#g)"/>
+</svg>
