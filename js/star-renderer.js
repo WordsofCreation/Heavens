@@ -902,6 +902,17 @@ export function renderObservatoryPage({ skyNodes, journeys, regions, storyPanels
           <canvas id="observatory-canvas" class="observatory-canvas" width="1400" height="760" aria-hidden="true"></canvas>
           <div class="observatory-hud">
             <div class="observatory-chip-row" id="observatory-filter-group" aria-label="Observatory filters"></div>
+            <div class="observatory-stage-legend mini-panel" aria-label="Observatory legend">
+              <div class="legend-cluster">
+                <span class="legend-dot legend-dot-gold"></span><span>Brighter, warmer landmarks</span>
+              </div>
+              <div class="legend-cluster">
+                <span class="legend-dot legend-dot-blue"></span><span>Hot blue-white stars</span>
+              </div>
+              <div class="legend-cluster">
+                <span class="legend-line"></span><span>Story-linked sky routes</span>
+              </div>
+            </div>
             <div class="observatory-hotspots" id="observatory-hotspots" aria-label="Highlighted objects"></div>
           </div>
           <div class="observatory-status-panel mini-panel">
@@ -929,6 +940,15 @@ export function renderObservatoryPage({ skyNodes, journeys, regions, storyPanels
               ${journeys.map((journey) => `<button class="journey-button" type="button" data-journey-id="${journey.id}"><span>${journey.title}</span><small>${journey.theme}</small></button>`).join('')}
             </div>
             <div id="observatory-journey-panel"></div>
+          </article>
+          <article class="mini-panel observatory-panel-block">
+            <p class="section-kicker">Read the sky</p>
+            <h2>What the visual language means</h2>
+            <div class="observatory-learning-list">
+              <div><strong>Star size</strong><p>Larger glow markers flag especially bright or emphasized objects in this educational scene.</p></div>
+              <div><strong>Star color</strong><p>Blue-white stars are hotter; gold and red tones indicate cooler surfaces or warmer-looking light.</p></div>
+              <div><strong>Connection lines</strong><p>Lines connect objects that belong to the same observing story, region, or comparison route.</p></div>
+            </div>
           </article>
         </aside>
       </div>

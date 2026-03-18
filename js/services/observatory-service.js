@@ -113,6 +113,23 @@ const STORY_PANELS = [
   }
 ];
 
+const SKY_CONNECTIONS = [
+  ['betelgeuse', 'bellatrix'],
+  ['bellatrix', 'rigel'],
+  ['betelgeuse', 'orion-nebula'],
+  ['orion-nebula', 'rigel'],
+  ['betelgeuse', 'aldebaran'],
+  ['aldebaran', 'pleiades'],
+  ['vega', 'deneb'],
+  ['deneb', 'altair'],
+  ['vega', 'altair'],
+  ['polaris', 'vega'],
+  ['andromeda-galaxy', 'pleiades'],
+  ['sirius', 'rigel'],
+  ['canopus', 'sirius'],
+  ['arcturus', 'antares']
+];
+
 const CONSTELLATION_REGIONS = [
   {
     id: 'orion',
@@ -193,8 +210,16 @@ export async function getObservatoryData() {
 
   const tonightJourney = journeys[0];
 
+  const skyConnections = SKY_CONNECTIONS.map(([fromId, toId]) => ({
+    fromId,
+    toId,
+    from: skyNodes.find((object) => object.id === fromId),
+    to: skyNodes.find((object) => object.id === toId)
+  })).filter((connection) => connection.from && connection.to);
+
   return {
     skyNodes,
+    skyConnections,
     journeys,
     regions,
     storyPanels: STORY_PANELS,
