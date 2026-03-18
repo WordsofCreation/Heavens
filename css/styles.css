@@ -538,6 +538,22 @@ select, input, button { font: inherit; }
 .observatory-hud { inset: 1rem; pointer-events: none; }
 .observatory-chip-row, .observatory-hotspots { pointer-events: auto; }
 .observatory-chip-row { display: flex; flex-wrap: wrap; gap: 0.65rem; max-width: 70%; }
+.observatory-stage-legend {
+  position: absolute;
+  top: 4.4rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.8rem 0.9rem;
+  background: rgba(6, 11, 25, 0.68);
+  backdrop-filter: blur(10px);
+  max-width: 260px;
+}
+.legend-cluster { display: flex; align-items: center; gap: 0.55rem; color: var(--text-muted); font-size: 0.84rem; }
+.legend-dot { width: 0.75rem; height: 0.75rem; border-radius: 999px; display: inline-block; box-shadow: 0 0 16px currentColor; }
+.legend-dot-gold { color: var(--gold); background: radial-gradient(circle at 35% 35%, #fff7dc, var(--gold)); }
+.legend-dot-blue { color: var(--blue); background: radial-gradient(circle at 35% 35%, #ffffff, var(--blue)); }
+.legend-line { width: 1.4rem; height: 2px; background: linear-gradient(90deg, var(--gold), var(--blue)); border-radius: 999px; }
 .observatory-hotspots { position: absolute; inset: 0; }
 .observatory-hotspot {
   position: absolute;
@@ -574,6 +590,10 @@ select, input, button { font: inherit; }
 .observatory-badge-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
 .observatory-detail-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .nested-panel { margin-top: 1rem; background: rgba(255,255,255,0.025); }
+.observatory-metric-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 1rem; }
+.observatory-learning-list { display: grid; gap: 0.9rem; }
+.observatory-learning-list div { padding: 0.95rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+.observatory-learning-list strong { display: block; margin-bottom: 0.35rem; }
 .journey-list { display: grid; gap: 0.75rem; }
 .journey-button {
   text-align: left;
@@ -609,9 +629,11 @@ select, input, button { font: inherit; }
   .observatory-preview { flex-direction: column; align-items: start; }
   .observatory-stage, .observatory-canvas { min-height: 560px; }
   .observatory-chip-row { max-width: none; }
+  .observatory-stage-legend { position: static; max-width: none; margin-top: 0.75rem; }
   .observatory-status-panel { position: static; margin: 1rem; max-width: none; }
   .observatory-hotspot-label { font-size: 0.72rem; }
   .observatory-detail-list { grid-template-columns: 1fr; }
+  .observatory-metric-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

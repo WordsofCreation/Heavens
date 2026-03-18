@@ -406,7 +406,7 @@ async function initObservatory() {
   if (!canvas || !hotspots || !filterGroup || !objectPanel || !journeyPanel) return;
 
   const ctx = canvas.getContext('2d');
-  const { skyNodes, journeys, regions, storyPanels } = observatoryData;
+  const { skyNodes, skyConnections, journeys, regions, storyPanels } = observatoryData;
   let activeJourney = journeys.find((journey) => journey.id === params.get('journey')) || journeys.find((journey) => journey.id === loadJourneyState().activeJourney?.id) || journeys[0];
   let activeFilter = params.get('filter') || 'all';
   let activeObject = skyNodes.find((object) => object.id === params.get('object')) || skyNodes.find((object) => object.id === loadJourneyState().lastObject?.id) || activeJourney.objects[0] || skyNodes[0];
@@ -430,6 +430,7 @@ async function initObservatory() {
     if (activeFilter === 'favorites') return skyNodes.filter((object) => activeJourney.objectIds.includes(object.id));
     if (activeFilter === 'naked-eye') return skyNodes.filter((object) => ['sirius','betelgeuse','rigel','vega','polaris','pleiades','andromeda-galaxy','aldebaran','arcturus'].includes(object.id));
     if (activeFilter === 'by-color') return skyNodes.filter((object) => object.temperatureK || object.color);
+    if (activeFilter === 'deep-space') return skyNodes.filter((object) => object.type.toLowerCase().includes('nebula') || object.type.toLowerCase().includes('galaxy') || object.distanceLightYears > 1000);
     return skyNodes;
   };
 
@@ -438,7 +439,8 @@ async function initObservatory() {
       { id: 'all', label: 'All highlights' },
       { id: 'favorites', label: 'Tonight's Journey' },
       { id: 'naked-eye', label: 'Naked-eye favorites' },
-      { id: 'by-color', label: 'Explore by color' }
+      { id: 'by-color', label: 'Explore by color' },
+      { id: 'deep-space', label: 'Deep-sky giants' }
     ];
     filterGroup.innerHTML = filters.map((filter) => `<button type="button" class="filter-chip${filter.id === activeFilter ? ' is-selected' : ''}" data-filter-id="${filter.id}">${filter.label}</button>`).join('');
     filterGroup.querySelectorAll('[data-filter-id]').forEach((button) => {
@@ -449,6 +451,18 @@ async function initObservatory() {
         syncUrl();
       });
     });
+  };
+
+  const routeConnections = () => skyConnections.filter((connection) => {
+    const visibleIds = new Set(visibleNodes().map((node) => node.id));
+    return visibleIds.has(connection.fromId) && visibleIds.has(connection.toId);
+  });
+
+  const storyMetrics = (object) => {
+    const brightnessBand = object.apparentMagnitude <= 0 ? 'Brilliant anchor' : object.apparentMagnitude <= 1.5 ? 'Easy landmark' : 'Patient-eye target';
+    const scaleBand = object.distanceLightYears > 100000 ? 'Galaxy scale' : object.distanceLightYears > 1000 ? 'Deep sky' : object.distanceLightYears > 100 ? 'Regional giant' : 'Nearby star';
+    const scienceBand = object.type.toLowerCase().includes('nebula') ? 'Stellar nursery' : object.type.toLowerCase().includes('galaxy') ? 'Island universe' : object.spectralClass?.startsWith('M') ? 'Cool red star' : object.spectralClass?.startsWith('A') || object.spectralClass?.startsWith('B') || object.spectralClass?.startsWith('O') ? 'Hot luminous star' : 'Reference star';
+    return { brightnessBand, scaleBand, scienceBand };
   };
 
   const renderHotspots = () => {
@@ -463,6 +477,7 @@ async function initObservatory() {
     const region = regions.find((item) => item.objectIds.includes(object.id));
     const relatedTopics = (object.relatedTopicCards || []).slice(0, 3).map((topic) => `<a class="tag tag-link" href="${toAbsolutePath(topic.pageHref)}">${topic.title}</a>`).join('');
     const fame = object.apparentMagnitude <= 1 ? 'Headline sky object' : object.distanceLightYears > 100000 ? 'Cosmic scale landmark' : 'Guided observatory target';
+    const metrics = storyMetrics(object);
     const journeyState = loadJourneyState();
     const links = buildCrossLinks(object, { journeyId: activeJourney?.id, from: 'observatory', regionId: region?.id || undefined, compareTo: 'sun' });
     objectPanel.innerHTML = `
@@ -482,6 +497,8 @@ async function initObservatory() {
         <div class="observatory-badge-row">
           <span class="tag">${fame}</span>
           <span class="tag">${region ? region.name : 'Sky highlight'}</span>
+          <span class="tag">${metrics.brightnessBand}</span>
+          <span class="tag">${metrics.scaleBand}</span>
         </div>
         <p>${object.summary}</p>
         <div class="detail-list observatory-detail-list">
@@ -493,6 +510,11 @@ async function initObservatory() {
           <div><strong>Why it matters</strong><p>${object.importance}</p></div>
         </div>
         <div class="distance-meter"><div class="distance-meter-bar"><span style="width:${distanceFill(object.distanceLightYears)}"></span></div><small>Distance scale in the observatory collection</small></div>
+        <section class="observatory-metric-grid">
+          <article class="mini-panel nested-panel"><p class="section-kicker">Brightness cue</p><h3>${metrics.brightnessBand}</h3><p>Apparent magnitude: ${typeof object.apparentMagnitude === 'number' ? object.apparentMagnitude : '—'}. This tells users how strongly the object stands out from Earth.</p></article>
+          <article class="mini-panel nested-panel"><p class="section-kicker">Cosmic scale</p><h3>${metrics.scaleBand}</h3><p>${object.name} sits at ${object.distance}, helping users feel the jump from nearby stars to nebulae and galaxies.</p></article>
+          <article class="mini-panel nested-panel"><p class="section-kicker">Science lens</p><h3>${metrics.scienceBand}</h3><p>${object.importance}</p></article>
+        </section>
         <section class="mini-panel nested-panel"><h3>What its light reveals</h3><p>${object.lightStory}</p></section>
         <section class="mini-panel nested-panel"><h3>Journey continuity</h3><p>${journeyState.activeJourney ? `You are in the ${journeyState.activeJourney.title} path.` : 'Open a guided route to connect this target to a bigger sky story.'}</p><div class="stacked-links">${journeyState.activeJourney ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/learn.html#path-${journeyState.activeJourney.id}`)}\">Continue the learning thread</a>` : ''}<a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${links.objectPage}">Open full object page</a></div></section>
         <section class="mini-panel nested-panel"><h3>Discovery actions</h3><div class="stacked-links"><a class="text-link" href="${links.skyViewer}">Open in Sky Viewer</a><a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${toAbsolutePath(`pages/discover.html`)}">Explore related science</a>${object.relatedObjectIds?.[0] ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/observatory.html?object=${object.relatedObjectIds[0]}&journey=${activeJourney?.id || ''}&from=related`)}\">Explore related objects</a>` : ''}<a class="text-link" href="${toAbsolutePath(`pages/objects/sun.html?compare=${object.id}`)}">Compare to the Sun</a></div></section>
@@ -576,17 +598,46 @@ async function initObservatory() {
     }
 
     const nodes = visibleNodes();
+
+    routeConnections().forEach((connection) => {
+      const fromX = ((connection.from.x - camera.x) * camera.scale + 50) / 100 * width;
+      const fromY = ((connection.from.y - camera.y) * camera.scale + 50) / 100 * height;
+      const toX = ((connection.to.x - camera.x) * camera.scale + 50) / 100 * width;
+      const toY = ((connection.to.y - camera.y) * camera.scale + 50) / 100 * height;
+      const gradientLine = ctx.createLinearGradient(fromX, fromY, toX, toY);
+      gradientLine.addColorStop(0, 'rgba(240,210,138,0.2)');
+      gradientLine.addColorStop(1, 'rgba(135,171,255,0.18)');
+      ctx.strokeStyle = gradientLine;
+      ctx.lineWidth = connection.from.id === activeObject.id || connection.to.id === activeObject.id ? 2.2 : 1.1;
+      ctx.setLineDash(connection.from.regionId === connection.to.regionId ? [] : [6, 9]);
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      const midX = (fromX + toX) / 2;
+      const midY = (fromY + toY) / 2 - 24;
+      ctx.quadraticCurveTo(midX, midY, toX, toY);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
     nodes.forEach((node) => {
       const px = ((node.x - camera.x) * camera.scale + 50) / 100 * width;
       const py = ((node.y - camera.y) * camera.scale + 50) / 100 * height;
       if (px < -50 || py < -50 || px > width + 50 || py > height + 50) return;
-      const glow = ctx.createRadialGradient(px, py, 0, px, py, 38);
+      const shimmerRadius = node.id === activeObject.id ? 54 : 38;
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, shimmerRadius);
       glow.addColorStop(0, colorMap(node));
       glow.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(px, py, 38, 0, Math.PI * 2);
+      ctx.arc(px, py, shimmerRadius, 0, Math.PI * 2);
       ctx.fill();
+      if (node.id === activeObject.id) {
+        ctx.strokeStyle = 'rgba(240,210,138,0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(px, py, shimmerRadius + 12 + (prefersReducedMotion ? 0 : Math.sin(performance.now() * 0.003) * 3), 0, Math.PI * 2);
+        ctx.stroke();
+      }
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(px, py, node.id === activeObject.id ? node.size + 2 : node.size, 0, Math.PI * 2);
