@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Explore | Heavens</title>
-    <meta name="description" content="Search stars, nebulae, and galaxies in the Heavens astronomy catalog." />
+    <meta
+      name="description"
+      content="Explore stars, nebulae, galaxies, and star-forming regions with filters, comparison tools, and beginner-friendly science insights."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -33,34 +36,69 @@
 
       <main id="main-content" class="section page-intro-shell">
         <section class="container page-intro reveal-on-scroll">
-          <p class="eyebrow">Explore</p>
-          <h1>The Heavens catalog</h1>
+          <p class="eyebrow">Star Explorer</p>
+          <h1>Explore stars, nebulae, galaxies, and the science hidden in their light.</h1>
           <p>
-            Search bright stars and notable celestial objects, filter by category, and open a quick detail panel
-            to learn where each object belongs in the sky and what makes it scientifically interesting.
+            Search a growing local catalog, sort by sky-friendly details, compare objects side by side, and open a polished
+            detail view that turns raw astronomy data into approachable explanations.
           </p>
         </section>
 
+        <section class="container science-strip reveal-on-scroll" aria-label="Science insights">
+          <article class="science-callout">
+            <p class="eyebrow">Insight</p>
+            <h2>Blue stars are usually hotter than red stars.</h2>
+            <p>Color is not just decorative: a star's hue is one of the fastest clues to its surface temperature.</p>
+          </article>
+          <article class="science-callout">
+            <p class="eyebrow">Insight</p>
+            <h2>Spectral class helps astronomers decode temperature and chemistry.</h2>
+            <p>Those letter-and-number labels summarize what a spectrum says about a star's light.</p>
+          </article>
+          <article class="science-callout">
+            <p class="eyebrow">Insight</p>
+            <h2>Distance changes how bright an object appears from Earth.</h2>
+            <p>Some modest-looking objects are truly immense; they only seem faint because they are far away.</p>
+          </article>
+        </section>
+
         <section class="container explore-layout">
-          <aside class="control-panel reveal-on-scroll">
+          <aside class="control-panel reveal-on-scroll" aria-label="Explorer controls">
             <label for="search-input">Search the catalog</label>
-            <input id="search-input" type="search" placeholder="Search by name, type, or constellation" />
+            <input id="search-input" type="search" placeholder="Search by name, type, constellation, or science topic" />
+
             <fieldset>
               <legend>Filter by category</legend>
               <div class="filter-group" id="filter-group"></div>
             </fieldset>
+
+            <div class="sort-block">
+              <label for="sort-select">Sort objects</label>
+              <select id="sort-select">
+                <option value="name">Name</option>
+                <option value="distance">Distance</option>
+                <option value="brightness">Brightness</option>
+                <option value="type">Object type</option>
+              </select>
+            </div>
+
+            <article class="context-panel" id="context-panel" aria-live="polite"></article>
             <p class="results-count" id="results-count"></p>
           </aside>
 
           <section class="catalog-panel">
+            <div class="compare-panel reveal-on-scroll" id="compare-panel" aria-live="polite"></div>
             <div class="catalog-grid" id="catalog-grid" aria-live="polite"></div>
           </section>
         </section>
       </main>
 
-      <dialog class="detail-dialog" id="detail-dialog">
+      <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="detail-title">
         <div class="dialog-header">
-          <p class="eyebrow">Catalog detail</p>
+          <div>
+            <p class="eyebrow">Explorer detail</p>
+            <p class="dialog-helper">Beginner-friendly notes grounded in introductory astronomy.</p>
+          </div>
           <button type="button" class="dialog-close" id="dialog-close" aria-label="Close detail panel">×</button>
         </div>
         <div id="detail-content"></div>
@@ -74,11 +112,11 @@
           </div>
           <div>
             <p class="footer-heading">Catalog focus</p>
-            <p id="deep-sky">Includes bright stars, stellar giants, stellar nurseries, and nearby galaxies for first-release exploration.</p>
+            <p id="deep-sky">From bright nearby suns to distant galaxies, the explorer is structured for easy expansion into future astronomy APIs.</p>
           </div>
           <div>
             <p class="footer-heading">Tip</p>
-            <p>Use the category filters to compare how stars differ from nebulae and galaxies in both appearance and physical scale.</p>
+            <p>Select up to three objects to compare how distance, color, and spectral class shape what we see from Earth.</p>
           </div>
         </div>
       </footer>
