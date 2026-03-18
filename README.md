@@ -1,23 +1,25 @@
 # Heavens
 
-Heavens is a polished, mobile-friendly astronomy website built as a lightweight static site for GitHub Pages. It focuses on visual exploration of stars and approachable explanations of starlight, spectra, constellations, deep-sky objects, and stellar evolution.
+Heavens is a polished, mobile-friendly astronomy website built as a lightweight static site for GitHub Pages. It now combines a local-first object explorer with a real sky viewing workflow powered by an embedded Aladin Lite experience.
 
 ## Project goals
 
 - Fast static deployment with no heavy framework requirements
 - Elegant cosmic visual design with accessible contrast
 - Semantic HTML, organized CSS, and modular vanilla JavaScript
-- Clear educational content written for general learners
+- Clean extension points for future astronomy APIs without breaking GitHub Pages compatibility
 - Responsive layouts that work well on phones, tablets, and desktop screens
 
-## What's new in the Star Explorer release
+## What's new in the Sky Viewer release
 
-- A richer **Star Explorer** page with search, category filters, and sorting by name, distance, brightness, or object type
-- A polished object detail dialog with science-focused sections including **What its light tells us** and **Why this object matters**
-- A local dataset expanded to **24 real celestial objects** spanning bright stars, nearby stars, red giants and supergiants, nebulae, galaxies, clusters, and star-forming regions
-- A side-by-side comparison tool for up to three selected objects
-- Science-layer callouts and visual cues such as spectral labels, color indicators, and distance bars
-- A homepage **Tonight's Featured Wonder** rotation powered entirely by local data and date-based logic
+- A new **Sky Viewer** page that embeds **Aladin Lite** inside the Heavens design system
+- Deep-linking from Explore into Sky Viewer with URLs such as `pages/sky-viewer.html?object=andromeda-galaxy`
+- Local object search that centers the viewer on a selected catalog entry and adds a marker overlay
+- Rich side panels with object type, constellation, coordinates, a short science summary, nearby local objects, and integration readiness notes
+- Expanded object detail dialogs with **Observed Through Light** explanations covering color, spectra, brightness, distance, motion, and composition
+- A lightweight astronomy service layer for local data loading, object lookup, sky-viewer coordination, and future external adapters
+- Progressive-enhancement support for lightweight external summaries, with graceful fallback when live services are unavailable
+- Reusable science insight cards used across the explorer and the sky-viewer experience
 
 ## Project structure
 
@@ -29,15 +31,21 @@ Heavens is a polished, mobile-friendly astronomy website built as a lightweight 
 ├── data/
 │   └── objects.json
 ├── js/
+│   ├── config.js
 │   ├── data-loader.js
 │   ├── main.js
 │   ├── search.js
 │   ├── star-renderer.js
-│   └── ui.js
+│   ├── ui.js
+│   └── services/
+│       ├── external-data-service.js
+│       ├── object-service.js
+│       └── sky-viewer-service.js
 ├── pages/
 │   ├── about.html
 │   ├── explore.html
 │   ├── science-of-starlight.html
+│   ├── sky-viewer.html
 │   └── star-life-cycles.html
 ├── index.html
 └── README.md
@@ -45,72 +53,99 @@ Heavens is a polished, mobile-friendly astronomy website built as a lightweight 
 
 ## Pages
 
-- **Home**: Hero section, rotating featured object, lightweight SVG constellation viewer, and quick links into the explorer
-- **Explore**: Searchable, filterable, sortable astronomy explorer with comparison tools and an accessible detail dialog
+- **Home**: Hero section, rotating featured object, quick links into Explore and Sky Viewer, and premium astronomy callouts
+- **Explore**: Searchable, filterable, sortable astronomy explorer with comparison tools, object detail dialogs, and Sky Viewer jump actions
+- **Sky Viewer**: Embedded Aladin Lite map, local object search, marker overlays, deep links, nearby object suggestions, and future integration placeholders
 - **Science of Starlight**: Educational content on spectra, color, temperature, and Doppler shifting
 - **Star Life Cycles**: Introductory guide to stellar birth, evolution, and final outcomes
 - **About**: Project purpose and editorial direction
 
-## How the explorer works
+## How object linking works
 
-The explorer is intentionally local-data-first and static-host friendly.
+The object-to-sky flow is GitHub Pages friendly and relies on URL query parameters rather than server routing.
 
-1. `js/data-loader.js` fetches `data/objects.json`.
-2. `js/search.js` filters and sorts the loaded objects.
-3. `js/star-renderer.js` builds the catalog cards, detail dialog, comparison view, homepage featured object blocks, and contextual science copy.
-4. `js/main.js` connects the controls, URL query state, comparison logic, and detail deep-linking.
-5. `js/ui.js` handles shared UI behaviors such as navigation, reveal animations, the constellation viewer, and focus management for the dialog.
+1. The Explore page renders **View in Sky Viewer** actions on catalog cards and in object detail dialogs.
+2. Those actions link to `pages/sky-viewer.html?object=<id>`.
+3. `js/main.js` reads the `object` query parameter on the Sky Viewer page.
+4. `js/services/object-service.js` resolves the object from local data, adds parsed RA/Dec degrees, and supplies related-object lookups.
+5. `js/services/sky-viewer-service.js` loads Aladin Lite progressively, centers the viewer, and drops a marker overlay on the selected object.
+6. If the viewer script cannot load, the object panel still renders local coordinates and science content so the experience remains useful.
 
-The homepage featured object uses local date rotation logic, so the featured target changes over time without any backend or external API.
+## Service layer architecture
+
+The site is still intentionally lightweight, but the data path is now modular and ready for live astronomy integrations.
+
+### `js/data-loader.js`
+- Fetches `data/objects.json`
+- Keeps local static data as the reliable foundation
+
+### `js/services/object-service.js`
+- Caches and enriches local objects
+- Parses right ascension and declination into degrees
+- Resolves objects by stable `id`
+- Computes a small list of nearby local objects for the Sky Viewer side panel
+
+### `js/services/sky-viewer-service.js`
+- Loads Aladin Lite only when the Sky Viewer page needs it
+- Injects the external stylesheet cleanly
+- Creates the viewer instance and a marker overlay
+- Exposes a small API for centering objects and toggling the coordinate grid
+
+### `js/services/external-data-service.js`
+- Holds progressive-enhancement logic for optional public summaries
+- Provides a status list for future astronomy integrations
+- Central place to add resilient adapters without coupling live services directly into UI rendering
+
+### `js/config.js`
+- Stores Sky Viewer library URLs and future API configuration stubs
+- Keeps third-party integration settings in one place
+
+## Future astronomy API integration points
+
+The codebase includes configuration-driven placeholders for:
+
+- **SIMBAD** for richer object metadata and identifiers
+- **MAST** for archive imagery and mission-linked observations
+- **ADS** for beginner-friendly literature or discovery context
+- **NED** for extragalactic data and galaxy-specific context
+
+Right now these services are intentionally represented as planned adapters. The site does not depend on them to function.
+
+### Recommended next wiring steps
+
+1. Create one adapter per service inside `js/services/adapters/`.
+2. Normalize live responses into the same field shape used by `data/objects.json`.
+3. Merge live fields into the local object model only when requests succeed.
+4. Cache lightweight responses in `sessionStorage` so GitHub Pages remains fast and resilient.
+5. Keep all UI panels rendering from the same normalized object schema.
 
 ## Data structure
 
-`data/objects.json` is the source of truth for the explorer. Each object is a publishable content record that can later be mapped into API-backed results.
+`data/objects.json` remains the source of truth. Each object now includes both educational content and sky-linking data.
 
-Each object currently uses these fields:
+Key fields include:
 
-- `id`: stable slug used for deep links such as `pages/explore.html?object=andromeda-galaxy`
-- `name`: display name
-- `category`: broad explorer grouping such as `Stars`, `Nearby stars`, or `Nebulae`
-- `type`: more specific object label
-- `constellation`: sky location context
-- `distance`: reader-friendly display string
-- `distanceLightYears`: numeric distance used for sorting and visual scaling
-- `spectralClass`: stellar class or `Not applicable`
-- `color`: apparent color or color description
-- `apparentMagnitude`: brightness field used for comparison and sorting when available
-- `temperatureK`: approximate surface temperature in Kelvin when applicable
-- `sizeNotes`: short scale note for comparison UI
-- `summary`: concise overview copy
-- `lightStory`: beginner-friendly explanation of what the object's light reveals
-- `importance`: why the object matters scientifically or educationally
-- `scienceFacts`: short fact list used in detail and comparison views
+- `id`: stable slug used for deep links
+- `name`, `category`, `type`, `constellation`
+- `distance`, `distanceLightYears`
+- `spectralClass`, `color`, `apparentMagnitude`, `temperatureK`
+- `summary`, `lightStory`, `importance`, `scienceFacts`
+- `ra`, `dec`: coordinate strings used for sky centering
+- `aladinTarget`: object-friendly lookup label for future viewer enhancements
+- `observedThroughLight`: structured beginner-friendly science explanations for object detail panels
+- `scienceCards`: reusable insight content attached to each object
+- `skyGuide`: short guidance text for map-based exploration
 
-## How to add more celestial objects
+## External scripts and setup notes
 
-1. Open `data/objects.json`.
-2. Add a new object using the same field structure as the existing entries.
-3. Choose a stable, URL-safe `id`.
-4. Keep `distanceLightYears`, `apparentMagnitude`, and `temperatureK` numeric where possible so sorting and comparison continue to work.
-5. Place the object into one of the current explorer categories, or add a new category if you want a new filter chip to appear automatically.
-6. Write polished `summary`, `lightStory`, and `importance` copy so the detail dialog remains publishable.
+The project stays static-host friendly.
 
-Because category filters are generated from the dataset, new categories will automatically appear in the explorer controls. Because the homepage feature rotation draws from the full dataset, newly added objects can also become future featured wonders.
+- The local catalog and detail views work entirely from `data/objects.json`.
+- Aladin Lite is loaded client-side only on `pages/sky-viewer.html`.
+- If the external script fails, the page falls back to local search, coordinates, and science panels.
+- No secrets, server infrastructure, or copyrighted image packs are required.
 
-## Design system
-
-The main design system lives in `css/styles.css` and uses CSS custom properties for:
-
-- Colors and elevated surfaces
-- Border radius, spacing feel, and shadows
-- Motion and reduced-motion handling
-- Shared components such as cards, buttons, panels, spectral pills, comparison layouts, and dialog surfaces
-
-## Local development
-
-Because the site uses JavaScript modules and fetches a local JSON file, run it through a local static server rather than opening the files directly in the browser.
-
-Examples:
+Because JavaScript modules and local JSON are used, serve the project from a local static server during development.
 
 ```bash
 python3 -m http.server 8000
@@ -127,13 +162,13 @@ This project is designed for GitHub Pages as a static site.
 3. Set the deployment source to the main branch (or your preferred publishing branch) and the repository root.
 4. Save and wait for GitHub Pages to publish the site.
 
-Because all navigation uses relative links and local JSON, the pages work cleanly in a standard GitHub Pages static deployment.
+Because navigation uses relative links, local JSON, and query-parameter deep links, the pages work cleanly in a standard GitHub Pages static deployment.
 
 ## Key implementation choices
 
 - **Vanilla architecture**: Keeps the project lightweight, readable, and easy to host anywhere.
-- **Local data first**: Makes the experience reliable on GitHub Pages while leaving a clean path to future live astronomy APIs.
-- **Modular JavaScript**: Separates data loading, filtering logic, rendering, and shared UI helpers.
-- **Accessible interactions**: Includes skip links, keyboard-friendly cards, a focus-managed dialog, semantic landmarks, and reduced-motion support.
-- **CSS-generated atmosphere**: Uses gradients, stars, glow effects, and SVG rather than external copyrighted images.
-- **Educational polish**: Favors concise, publishable copy over placeholder content.
+- **Local data first**: Makes the experience reliable even when live integrations fail.
+- **Progressive enhancement**: External viewers and public summaries improve the experience without becoming a hard dependency.
+- **Modular JavaScript**: Separates data loading, filtering logic, rendering, object services, and viewer integration.
+- **Accessible interactions**: Includes keyboard-friendly cards, dialog focus management, reduced-motion handling, loading states, and empty states.
+- **Premium visual integration**: Wraps the embedded viewer in the same surface, spacing, and typography system used elsewhere in Heavens.

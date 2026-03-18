@@ -305,3 +305,115 @@ select, input, button { font: inherit; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal-on-scroll { opacity: 1; transform: none; }
 }
+
+.button-ghost {
+  background: rgba(255,255,255,0.03);
+  border-color: var(--line);
+  color: var(--text);
+}
+.catalog-card-actions, .detail-actions, .stacked-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.detail-actions { margin-bottom: 1rem; }
+.detail-coordinates { margin: 0; color: var(--text-soft); }
+.observed-grid, .science-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.observed-grid div, .science-insight-card, .integration-list div {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.highlight-banner, .section-head, .sky-status-row, .toggle-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+.highlight-banner {
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(135,171,255,0.08), rgba(240,210,138,0.08));
+  margin-bottom: 1.5rem;
+}
+.sky-viewer-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.sky-viewer-main {
+  display: grid;
+  gap: 1.25rem;
+}
+.sky-viewer-frame, .sky-object-panel-shell {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+.aladin-lite-shell {
+  min-height: 540px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(135,171,255,0.18);
+  background: radial-gradient(circle at top, rgba(135,171,255,0.1), transparent 35%), #030814;
+}
+.aladin-lite-shell.is-fallback, .sky-fallback, .sky-empty-state, .sky-panel-empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.sky-fallback, .sky-empty-state {
+  min-height: 160px;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  margin-top: 1rem;
+}
+.sky-search-results {
+  display: grid;
+  gap: 0.65rem;
+  max-height: 420px;
+  overflow: auto;
+}
+.sky-search-result {
+  text-align: left;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  cursor: pointer;
+}
+.sky-search-result span, .related-list span { color: var(--text-soft); font-size: 0.9rem; }
+.sky-guidance, .integration-list, .inline-panel { margin-top: 0.75rem; }
+.related-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.7rem; }
+.related-list li { display: flex; justify-content: space-between; gap: 1rem; }
+.toggle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+@media (max-width: 960px) {
+  .sky-viewer-layout, .observed-grid, .science-insight-grid, .highlight-banner, .section-head, .sky-status-row { grid-template-columns: 1fr; }
+  .sky-viewer-layout { grid-template-columns: 1fr; }
+  .highlight-banner, .section-head, .sky-status-row { display: grid; }
+}
+@media (max-width: 720px) {
+  .observed-grid, .science-insight-grid { grid-template-columns: 1fr; }
+  .aladin-lite-shell { min-height: 380px; }
+}

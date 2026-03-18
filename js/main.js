@@ -1,7 +1,18 @@
-import { loadObjects } from './data-loader.js';
 import { filterObjects, getCategories, sortObjects } from './search.js';
-import { buildConstellationViewer, setupNavigation, setupRevealAnimations, trapDialogFocus } from './ui.js';
-import { renderCatalog, renderComparison, renderContextualInsight, renderDetail, renderFeaturedObject } from './star-renderer.js';
+import { setupNavigation, setupRevealAnimations, buildConstellationViewer, trapDialogFocus } from './ui.js';
+import {
+  renderCatalog,
+  renderComparison,
+  renderContextualInsight,
+  renderDetail,
+  renderFeaturedObject,
+  renderScienceInsights,
+  renderSkyViewerPanel,
+  renderFeaturedRegions
+} from './star-renderer.js';
+import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects } from './services/object-service.js';
+import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './services/external-data-service.js';
+import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
 
 setupNavigation();
 setupRevealAnimations();
@@ -9,12 +20,11 @@ buildConstellationViewer();
 
 const page = document.body.dataset.page;
 
-async function init() {
-  const objects = await loadObjects();
-  renderFeaturedObject(objects);
+function getBasePrefix() {
+  return window.location.pathname.includes('/pages/') ? '..' : '.';
+}
 
-  if (page !== 'explore') return;
-
+async function initExplore(objects) {
   const searchInput = document.getElementById('search-input');
   const filterGroup = document.getElementById('filter-group');
   const sortSelect = document.getElementById('sort-select');
@@ -47,8 +57,13 @@ async function init() {
     window.history.replaceState({}, '', nextUrl);
   };
 
-  const openObject = (object) => {
-    renderDetail({ ...object }, detailContent);
+  const openSkyViewer = (id) => {
+    window.location.href = `${getBasePrefix()}/pages/sky-viewer.html?object=${id}`;
+  };
+
+  const openObject = async (object) => {
+    const progressiveSummary = await getProgressiveObjectSummary(object);
+    renderDetail({ ...object }, detailContent, progressiveSummary);
     activeObjectId = object.id;
     if (!dialog.open) dialog.showModal();
     syncUrl();
@@ -62,6 +77,7 @@ async function init() {
         grid: catalogGrid,
         count: resultsCount,
         onSelect: openObject,
+        onViewSky: openSkyViewer,
         onToggleCompare: (id) => {
           if (compareIds.has(id)) {
             compareIds.delete(id);
@@ -127,9 +143,109 @@ async function init() {
   }
 }
 
+async function initSkyViewer(objects) {
+  const searchInput = document.getElementById('sky-object-search');
+  const resultList = document.getElementById('sky-search-results');
+  const panel = document.getElementById('sky-object-panel');
+  const viewerStatus = document.getElementById('sky-viewer-status');
+  const viewerFrame = document.getElementById('aladin-lite-viewer');
+  const emptyState = document.getElementById('sky-empty-state');
+  const guidance = document.getElementById('sky-guidance');
+  const scienceRail = document.getElementById('science-insights-rail');
+  const featuredRegions = document.getElementById('featured-regions');
+  const gridToggle = document.getElementById('sky-grid-toggle');
+
+  renderScienceInsights([
+    { title: 'Why blue stars are hotter', body: 'A star\'s color tracks the mix of wavelengths it emits most strongly, so hotter stars skew blue-white.' },
+    { title: 'How spectra reveal chemistry', body: 'Each atom leaves a pattern in light. That lets astronomers read chemistry from very far away.' },
+    { title: 'Why apparent brightness is not true luminosity', body: 'Distance can hide power. A remote supergiant may look fainter than a modest nearby star.' }
+  ], scienceRail);
+  renderFeaturedRegions(await getFeaturedRegions(), featuredRegions);
+
+  let api = null;
+  let activeObject = null;
+  const integrationStatus = getFutureIntegrationStatus();
+
+  const selectObject = async (object) => {
+    activeObject = object;
+    emptyState.hidden = true;
+    guidance.hidden = true;
+    viewerStatus.textContent = `Centering on ${object.name}…`;
+
+    const progressiveSummary = await getProgressiveObjectSummary(object);
+    renderSkyViewerPanel({
+      object,
+      relatedObjects: findRelatedObjects(object, objects),
+      integrationStatus,
+      progressiveSummary
+    }, panel);
+
+    if (api) {
+      focusObject(api, object);
+      viewerStatus.textContent = `${object.name} centered in the sky viewer.`;
+    } else {
+      viewerStatus.textContent = 'Sky map unavailable; object science panel still loaded.';
+    }
+
+    const next = new URLSearchParams(window.location.search);
+    next.set('object', object.id);
+    window.history.replaceState({}, '', `${window.location.pathname}?${next.toString()}`);
+  };
+
+  resultList.innerHTML = objects.map((object) => `<button type="button" class="sky-search-result" data-object-id="${object.id}">${object.name}<span>${object.type}</span></button>`).join('');
+  resultList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-object-id]');
+    if (!button) return;
+    const object = objects.find((item) => item.id === button.dataset.objectId);
+    if (object) selectObject(object);
+  });
+
+  searchInput.addEventListener('input', (event) => {
+    const value = event.target.value.trim().toLowerCase();
+    resultList.querySelectorAll('.sky-search-result').forEach((button) => {
+      const object = objects.find((item) => item.id === button.dataset.objectId);
+      const matches = !value || object.searchText.includes(value);
+      button.hidden = !matches;
+    });
+  });
+
+  try {
+    api = await createSkyViewer(viewerFrame);
+    viewerStatus.textContent = 'Interactive sky viewer ready.';
+    gridToggle?.addEventListener('change', () => toggleViewerGrid(api, gridToggle.checked));
+  } catch (error) {
+    console.warn(error);
+    viewerFrame.classList.add('is-fallback');
+    viewerFrame.innerHTML = `<div class="sky-fallback"><h2>Sky Viewer unavailable</h2><p>The interactive sky map could not load right now. Search still works with local coordinates and science summaries.</p></div>`;
+    viewerStatus.textContent = 'Interactive sky viewer unavailable.';
+  }
+
+  const objectFromUrl = new URLSearchParams(window.location.search).get('object');
+  if (objectFromUrl) {
+    const match = await getObjectById(objectFromUrl);
+    if (match) {
+      searchInput.value = match.name;
+      selectObject(match);
+    }
+  }
+}
+
+async function init() {
+  const objects = await getAstronomyObjects();
+  renderFeaturedObject(objects);
+
+  if (page === 'explore') {
+    await initExplore(objects);
+  }
+
+  if (page === 'sky-viewer') {
+    await initSkyViewer(objects);
+  }
+}
+
 init().catch((error) => {
   console.error(error);
-  const container = document.querySelector('[data-featured-object]') || document.getElementById('catalog-grid');
+  const container = document.querySelector('[data-featured-object]') || document.getElementById('catalog-grid') || document.getElementById('sky-object-panel');
   if (container) {
     container.innerHTML = '<p>Unable to load astronomy data right now.</p>';
   }
