@@ -1,11 +1,14 @@
 import { toAbsolutePath } from '../path-utils.js';
 
 const STORAGE_KEY = 'heavens:journey-state';
-const MAX_RECENT_OBJECTS = 6;
+const MAX_RECENT_OBJECTS = 8;
+const MAX_RECENT_COMPARISONS = 4;
 
 const memoryState = {
   recentObjects: [],
   comparisonSelections: [],
+  comparisonDraft: null,
+  recentComparisons: [],
   activeJourney: null,
   learningPath: null,
   lastMode: null,
@@ -97,6 +100,8 @@ export function clearJourneyState() {
   Object.assign(memoryState, cloneState({
     recentObjects: [],
     comparisonSelections: [],
+    comparisonDraft: null,
+    recentComparisons: [],
     activeJourney: null,
     learningPath: null,
     lastMode: null,
@@ -122,10 +127,40 @@ export function rememberObject(object, options = {}) {
   });
 }
 
-export function rememberComparison(objects = []) {
-  return saveJourneyState({
-    comparisonSelections: objects.map((object) => normalizeObjectContext(object)).filter(Boolean)
-  });
+export function rememberComparison(objects = [], options = {}) {
+  const comparisonSelections = objects.map((object) => normalizeObjectContext(object)).filter(Boolean);
+  const comparisonDraft = comparisonSelections.length ? {
+    ids: comparisonSelections.map((item) => item.id),
+    source: options.source || null,
+    restoredAt: options.restoredAt || null,
+    updatedAt: new Date().toISOString()
+  } : null;
+
+  const recentComparisons = comparisonSelections.length >= 2
+    ? [{ ids: comparisonSelections.map((item) => item.id), label: comparisonSelections.map((item) => item.name).join(' · '), updatedAt: new Date().toISOString() }, ...(loadJourneyState().recentComparisons || []).filter((entry) => entry.ids.join('|') !== comparisonSelections.map((item) => item.id).join('|'))].slice(0, MAX_RECENT_COMPARISONS)
+    : loadJourneyState().recentComparisons || [];
+
+  return saveJourneyState({ comparisonSelections, comparisonDraft, recentComparisons });
+}
+
+export function clearComparison() {
+  return saveJourneyState({ comparisonSelections: [], comparisonDraft: null });
+}
+
+export function queueComparisonObject(object, options = {}) {
+  const state = loadJourneyState();
+  const next = [...(state.comparisonSelections || []).filter((item) => item.id !== object?.id)];
+  const normalized = normalizeObjectContext(object);
+  if (normalized) next.push(normalized);
+  return rememberComparison(next.slice(0, 3), { source: options.source || state.lastSource || null });
+}
+
+export function getComparisonRestoreUrl(ids = [], options = {}) {
+  const params = new URLSearchParams();
+  if (ids.length) params.set('compare', ids.join(','));
+  if (options.restored) params.set('restored', '1');
+  if (options.from) params.set('from', options.from);
+  return `${toAbsolutePath('pages/explore.html')}?${params.toString()}`;
 }
 
 export function setActiveJourney(journey, extras = {}) {
@@ -187,3 +222,16 @@ export function getStorageAvailability() {
 }
 
 export { normalizeObjectContext };
+
+export function deriveComparisonStateFromUrl(objects = []) {
+  const params = new URLSearchParams(window.location.search);
+  const compareIds = (params.get('compare') || '').split(',').map((item) => item.trim()).filter(Boolean);
+  const restored = params.get('restored') === '1';
+  const validObjects = compareIds.map((id) => objects.find((object) => object.id === id)).filter(Boolean).slice(0, 3);
+  if (!compareIds.length) return { validObjects: [], missingIds: [], restored };
+  return {
+    validObjects,
+    missingIds: compareIds.filter((id) => !validObjects.find((object) => object.id === id)),
+    restored
+  };
+}

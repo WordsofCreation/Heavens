@@ -13,15 +13,19 @@ import {
   renderDiscoverPage,
   renderLearnPage,
   renderObservatoryPage,
-  renderHomepageExperience
+  renderHomepageExperience,
+  renderRecentObjectsPanel
 } from './star-renderer.js';
 import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects, getObjectPageData } from './services/object-service.js';
 import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './services/external-data-service.js';
 import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
 import { getDiscoverModules, getLearningPaths, getScienceTopics, getStartHereGuide } from './services/science-content-service.js';
 import { getObservatoryData } from './services/observatory-service.js';
+import { getJourneyById, getJourneysForObject, getStepState } from './services/journey-map-service.js';
 import {
   buildCrossLinks,
+  deriveComparisonStateFromUrl,
+  getComparisonRestoreUrl,
   getJourneyResume,
   getStorageAvailability,
   loadJourneyState,
@@ -41,6 +45,42 @@ const page = document.body.dataset.page;
 function navigateTo(link) {
   window.location.href = link;
 }
+
+
+function buildRecentPanel(options = {}) {
+  const state = loadJourneyState();
+  const currentJourneyId = options.currentJourneyId || state.activeJourney?.id || state.learningPath?.id || null;
+  const currentJourney = currentJourneyId ? getJourneyById(currentJourneyId) : null;
+  const resumeHref = currentJourney
+    ? toAbsolutePath(currentJourney.kind === 'learning' ? `pages/learn.html#path-${currentJourney.id}` : `pages/observatory.html?journey=${currentJourney.id}${state.lastObject?.id ? `&object=${state.lastObject.id}` : ''}`)
+    : null;
+  const items = (state.recentObjects || []).slice(0, options.limit || 4).map((item) => ({
+    ...item,
+    isJourneyMatch: currentJourneyId ? getJourneysForObject(item.id).some((journey) => journey.id === currentJourneyId) : false,
+    resumeHref,
+    resumeLabel: currentJourney ? (currentJourney.kind === 'learning' ? 'Continue learning' : 'Resume journey') : null
+  }));
+  return renderRecentObjectsPanel({
+    items,
+    title: options.title,
+    context: options.context,
+    currentJourneyId,
+    currentComparisonIds: (state.comparisonSelections || []).map((item) => item.id),
+    emptyMessage: options.emptyMessage
+  });
+}
+
+function buildContinueModule(label, href, description) {
+  return `
+    <article class="mini-panel continue-module">
+      <p class="section-kicker">Continue where you left off</p>
+      <h3>${label}</h3>
+      <p>${description}</p>
+      <a class="text-link" href="${href}">Resume now</a>
+    </article>
+  `;
+}
+
 
 function injectHomeJourneyResume() {
   if (page !== 'home') return;
@@ -70,6 +110,7 @@ async function initExplore(objects) {
   const resultsCount = document.getElementById('results-count');
   const comparePanel = document.getElementById('compare-panel');
   const contextPanel = document.getElementById('context-panel');
+  const recentPanelHost = document.getElementById('explore-recent-panel');
   const dialog = document.getElementById('detail-dialog');
   const detailContent = document.getElementById('detail-content');
   const dialogClose = document.getElementById('dialog-close');
@@ -79,7 +120,8 @@ async function initExplore(objects) {
   let activeQuery = params.get('q') || '';
   let activeSort = params.get('sort') || 'name';
   let activeObjectId = params.get('object') || '';
-  const compareIds = new Set((loadJourneyState().comparisonSelections || []).map((item) => item.id));
+  const restoreState = deriveComparisonStateFromUrl(objects);
+  const compareIds = new Set((restoreState.validObjects.length ? restoreState.validObjects : (loadJourneyState().comparisonSelections || [])).map((item) => item.id));
 
   searchInput.value = activeQuery;
   sortSelect.value = activeSort;
@@ -132,16 +174,22 @@ async function initExplore(objects) {
           } else if (compareIds.size < 3) {
             compareIds.add(id);
           }
-          rememberComparison(objects.filter((object) => compareIds.has(object.id)));
+          rememberComparison(objects.filter((object) => compareIds.has(object.id)), { source: 'Explore' });
           applyFilters();
         }
       },
       compareIds
     );
     const comparedObjects = objects.filter((object) => compareIds.has(object.id));
-    rememberComparison(comparedObjects);
-    renderComparison(comparedObjects, comparePanel);
+    rememberComparison(comparedObjects, { source: 'Explore', restoredAt: restoreState.restored ? new Date().toISOString() : null });
+    renderComparison(comparedObjects, comparePanel, {
+      restoredNotice: restoreState.restored && comparedObjects.length ? `Restored ${comparedObjects.length}-object comparison set.` : '',
+      missingNotice: restoreState.missingIds.length ? `Some saved objects could not be restored: ${restoreState.missingIds.join(', ')}.` : '',
+      continueHref: getComparisonRestoreUrl(comparedObjects.map((object) => object.id), { restored: true, from: 'explore' }),
+      clearHref: toAbsolutePath('pages/explore.html')
+    });
     renderContextualInsight(filtered.length ? filtered : objects, contextPanel, activeCategory);
+    if (recentPanelHost) recentPanelHost.innerHTML = buildRecentPanel({ title: 'Recent Objects for Explore', context: 'explore', emptyMessage: 'Open a few objects to build a fast-return panel here.' });
     syncUrl();
   };
 
@@ -298,6 +346,7 @@ async function initObservatory() {
   const journeyPanel = document.getElementById('observatory-journey-panel');
   const statusTitle = document.getElementById('observatory-status-title');
   const statusCopy = document.getElementById('observatory-status-copy');
+  const observatoryRecentPanel = document.getElementById('observatory-recent-panel');
 
   if (!canvas || !hotspots || !filterGroup || !objectPanel || !journeyPanel) return;
 
@@ -395,6 +444,7 @@ async function initObservatory() {
         <section class="mini-panel nested-panel"><h3>Related science topics</h3><div class="catalog-chip-row">${relatedTopics}</div></section>
       </div>`;
     objectLink.href = links.objectPage;
+    if (observatoryRecentPanel) observatoryRecentPanel.innerHTML = buildRecentPanel({ title: 'Recent Observatory Objects', context: 'observatory', currentJourneyId: activeJourney?.id, emptyMessage: 'Focus a few observatory targets to keep them ready here.' });
     statusTitle.textContent = object.name;
     statusCopy.textContent = `${object.skyGuide} ${region ? region.note : ''}`;
   };
@@ -537,7 +587,7 @@ async function initObjectPage() {
   }
 
   rememberObject(pageData.object, { mode: 'Object Page', source: new URLSearchParams(window.location.search).get('from') || 'Object Page' });
-  renderObjectPage({ ...pageData, journeyState: loadJourneyState(), crossLinks: buildCrossLinks(pageData.object, { journeyId: loadJourneyState().activeJourney?.id, from: 'object-page' }) }, target);
+  renderObjectPage({ ...pageData, journeyState: loadJourneyState(), recentPanel: buildRecentPanel({ title: 'Recent Objects', context: 'object-page', currentJourneyId: loadJourneyState().activeJourney?.id }), crossLinks: buildCrossLinks(pageData.object, { journeyId: loadJourneyState().activeJourney?.id, from: 'object-page' }) }, target);
 }
 
 async function initDiscoverPage(objects) {
@@ -545,7 +595,10 @@ async function initDiscoverPage(objects) {
   if (!target) return;
 
   const [modules, topics] = await Promise.all([getDiscoverModules(), getScienceTopics()]);
-  renderDiscoverPage({ modules, topics, objects }, target);
+  const state = loadJourneyState();
+  const currentJourneyId = state.activeJourney?.id || 'brightest-stars';
+  const step = getStepState(currentJourneyId, 'Understand') || getStepState('brightest-stars', 'Understand');
+  renderDiscoverPage({ modules, topics, objects, journeyStep: step, recentPanel: buildRecentPanel({ title: 'Recent Objects for Discover', context: 'discover', currentJourneyId }), continueModule: state.activeJourney ? buildContinueModule(state.activeJourney.title, toAbsolutePath(`pages/observatory.html?journey=${state.activeJourney.id}&object=${state.lastObject?.id || state.activeJourney.currentObjectId || ''}`), 'Return to the discovery flow that was active in Observatory Mode or recent exploration.') : '' }, target);
 }
 
 async function initLearnPage(objects) {
@@ -553,9 +606,10 @@ async function initLearnPage(objects) {
   if (!target) return;
 
   const [paths, topics, startHere] = await Promise.all([getLearningPaths(), getScienceTopics(), getStartHereGuide()]);
-  renderLearnPage({ paths, topics, startHere, objects }, target);
   const hash = window.location.hash.replace('#path-', '');
   const activePath = paths.find((path) => path.id === hash) || paths[0];
+  const step = getStepState(activePath?.id === 'stellar-life-cycle' ? 'stellar-evolution' : activePath?.id || 'understanding-starlight', 'Understand') || getStepState('understanding-starlight', 'Understand');
+  renderLearnPage({ paths, topics, startHere, objects, journeyStep: step, recentPanel: buildRecentPanel({ title: 'Recent Objects for Learn', context: 'learn', currentJourneyId: activePath?.id }), continueModule: loadJourneyState().learningPath ? buildContinueModule(loadJourneyState().learningPath.title, toAbsolutePath(`pages/learn.html#path-${loadJourneyState().learningPath.id}`), 'Pick up the lesson you were using most recently, then reopen the linked objects from recent history.') : '' }, target);
   if (activePath) setLearningPath(activePath);
 }
 
