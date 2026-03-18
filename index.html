@@ -4,16 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heavens | Explore the Stars</title>
-    <meta
-      name="description"
-      content="Heavens is a beautiful astronomy site for exploring stars, starlight, constellations, and the life cycles of stellar objects."
-    />
+    <meta name="description" content="Heavens is a polished astronomy platform for exploring stars, learning science, and discovering research connections through a beautiful static site." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
@@ -22,17 +16,13 @@
     <div class="site-shell">
       <header class="site-header">
         <div class="container nav-wrap">
-          <a class="brand" href="index.html" aria-label="Heavens home">
-            <span class="brand-mark">✦</span>
-            <span class="brand-text">Heavens</span>
-          </a>
-          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-            <span class="sr-only">Toggle navigation</span>
-            <span></span><span></span><span></span>
-          </button>
+          <a class="brand" href="index.html" aria-label="Heavens home"><span class="brand-mark">✦</span><span class="brand-text">Heavens</span></a>
+          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button>
           <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
             <a href="index.html">Home</a>
             <a href="pages/explore.html">Explore</a>
+            <a href="pages/discover.html">Discover</a>
+            <a href="pages/learn.html">Learn</a>
             <a href="pages/sky-viewer.html">Sky Viewer</a>
             <a href="pages/science-of-starlight.html">Science of Starlight</a>
             <a href="pages/star-life-cycles.html">Star Life Cycles</a>
@@ -46,14 +36,11 @@
           <div class="container hero-grid">
             <div class="hero-copy reveal-on-scroll">
               <p class="eyebrow">A modern guide to the night sky</p>
-              <h1>Explore the stars and understand the science behind their light.</h1>
-              <p class="hero-text">
-                Heavens brings together visual exploration and beginner-friendly astronomy so you can move
-                from wonder to understanding—one star, spectrum, and constellation at a time.
-              </p>
+              <h1>Explore stars visually, understand their science, and keep discovering what astronomers learn from light.</h1>
+              <p class="hero-text">Heavens now connects a polished object explorer, dedicated research-ready object pages, a discovery hub, and guided learning pathways into one elegant static astronomy experience.</p>
               <div class="hero-actions">
                 <a class="button button-primary" href="pages/explore.html">Start Exploring</a>
-                <a class="button button-secondary" href="pages/sky-viewer.html">Open Sky Viewer</a>
+                <a class="button button-secondary" href="pages/discover.html">Open Discover</a>
               </div>
             </div>
             <div class="hero-visual reveal-on-scroll" aria-hidden="true">
@@ -65,12 +52,6 @@
                 </div>
                 <div class="constellation-viewer">
                   <svg viewBox="0 0 320 240" role="img" aria-label="Stylized constellation viewer">
-                    <defs>
-                      <linearGradient id="constellationGlow" x1="0%" x2="100%" y1="0%" y2="100%">
-                        <stop offset="0%" stop-color="rgba(255,255,255,0.95)" />
-                        <stop offset="100%" stop-color="rgba(135,171,255,0.7)" />
-                      </linearGradient>
-                    </defs>
                     <g class="constellation-lines"></g>
                     <g class="constellation-stars"></g>
                   </svg>
@@ -83,79 +64,74 @@
         <section class="section">
           <div class="container featured-home-grid">
             <article class="feature-card reveal-on-scroll" data-home-featured-spotlight>
-              <p class="section-kicker">Tonight's Featured Wonder</p>
+              <p class="section-kicker">Today's featured object</p>
               <h2>Loading a rotating target...</h2>
-              <p>We rotate through our local data so the homepage feels alive without needing a backend.</p>
+              <p>We rotate through local content so the homepage feels alive without needing a backend.</p>
             </article>
-            <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">Star Explorer</p>
-              <h2>Search, filter, sort, and compare 24+ curated objects.</h2>
-              <p>
-                Move from bright naked-eye stars to stellar nurseries and galaxies, then open rich detail views and jump into Sky Viewer to see where those objects live on the sky.
-              </p>
-              <a href="pages/explore.html" class="text-link">Open Star Explorer</a>
-              <a href="pages/sky-viewer.html" class="text-link">Launch Sky Viewer</a>
+            <article class="feature-card reveal-on-scroll" data-object-of-day>
+              <p class="section-kicker">Featured object of the day</p>
+              <h2>Loading today's feature...</h2>
+              <p>Preparing a guided entry point into the object-page system.</p>
             </article>
-          </div>
-        </section>
-
-        <section class="mission-section section">
-          <div class="container narrow reveal-on-scroll">
-            <p class="section-kicker">Our mission</p>
-            <h2>Helping people explore the universe and understand the science behind what they see.</h2>
-            <p>
-              The sky can feel immense and mysterious. Heavens is designed to make it approachable—pairing
-              graceful visuals with clear explanations of how astronomers read starlight, map stellar lives,
-              and learn about the deep sky beyond our solar system.
-            </p>
           </div>
         </section>
 
         <section class="section">
           <div class="container card-grid four-up">
             <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">Explore the Stars</p>
-              <h2>Search bright stars and deep-sky landmarks.</h2>
-              <p>
-                Browse a curated catalog of famous stars, nebulae, galaxies, and clusters with filters, comparison tools,
-                spectral classes, and clear constellation context.
-              </p>
-              <a href="pages/explore.html" class="text-link">Open the catalog</a>
+              <p class="section-kicker">Begin learning astronomy</p>
+              <h2>Follow guided pathways that build understanding progressively.</h2>
+              <p>Move from starlight and classification to stellar evolution, distance, sky navigation, and scientific method in a calm self-guided learning experience.</p>
+              <a href="pages/learn.html" class="text-link">Start the Learn experience</a>
             </article>
             <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">Sky Viewer</p>
-              <h2>Center the real sky on curated objects.</h2>
-              <p>
-                Search Heavens' local dataset, place a marker in the embedded sky map, and keep a guided science panel beside the live view.
-              </p>
-              <a href="pages/sky-viewer.html" class="text-link">Explore the live sky</a>
+              <p class="section-kicker">Explore by science topic</p>
+              <h2>Browse a connected web of ideas, not isolated pages.</h2>
+              <p>Object pages link to learning topics, discovery modules link back to objects, and every route is designed to keep curiosity moving.</p>
+              <a href="pages/discover.html" class="text-link">Enter Discover</a>
             </article>
             <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">What Starlight Reveals</p>
-              <h2>Light carries the story of distant suns.</h2>
-              <p>
-                Learn how color, spectra, and motion hidden in starlight help astronomers measure
-                temperature, composition, and speed.
-              </p>
-              <a href="pages/science-of-starlight.html" class="text-link">Read the science</a>
+              <p class="section-kicker">Discover the sky</p>
+              <h2>Jump from reading to real sky context in one click.</h2>
+              <p>Each dedicated object page links directly into the Sky Viewer, so science ideas stay grounded in an actual sky position.</p>
+              <a href="pages/sky-viewer.html" class="text-link">Open Sky Viewer</a>
             </article>
             <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">Life and Death of Stars</p>
-              <h2>Follow the path from stellar birth to final remnants.</h2>
-              <p>
-                See how gravity shapes protostars, how fusion powers stable stars, and why some endings are
-                calm while others explode as supernovae.
-              </p>
-              <a href="pages/star-life-cycles.html" class="text-link">View the life cycles</a>
+              <p class="section-kicker">Research layer</p>
+              <h2>Curated science prompts prepare the site for deeper integrations.</h2>
+              <p>Featured stars, spectral spotlights, and research inspiration cards create a structure that can later connect to public archives without a major rewrite.</p>
+              <a href="pages/discover.html#research-spotlight" class="text-link">See research spotlight</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="mission-section section">
+          <div class="container narrow reveal-on-scroll">
+            <p class="section-kicker">Why Heavens exists</p>
+            <h2>To make the night sky feel connected: beautiful to look at, clear to learn from, and rich enough to keep exploring.</h2>
+            <p>Heavens exists because astronomy becomes more meaningful when visual wonder, scientific explanation, and discoverable learning routes all reinforce each other. The goal is not just to show objects, but to help people understand why they matter and where to go next.</p>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container card-grid three-up">
+            <article class="feature-card reveal-on-scroll">
+              <p class="section-kicker">Dedicated object pages</p>
+              <h2>Premium long-form pages for every catalog object.</h2>
+              <p>Stable GitHub Pages friendly URLs now give each object its own reading surface, key facts, related objects, and learning connections.</p>
+              <a href="pages/objects/sirius.html" class="text-link">View a sample object page</a>
             </article>
             <article class="feature-card reveal-on-scroll">
-              <p class="section-kicker">Deep Sky Wonders</p>
-              <h2>Step beyond the brightest stars.</h2>
-              <p>
-                From stellar nurseries to neighboring galaxies, discover objects that reveal how stars are born,
-                evolve, and gather into vast cosmic structures.
-              </p>
-              <a href="pages/explore.html?category=Galaxies" class="text-link">See deep sky objects</a>
+              <p class="section-kicker">Today in the Heavens</p>
+              <h2>Local rotating content keeps the experience lively.</h2>
+              <p>Daily featured objects work entirely from local data, preserving reliability while making the homepage feel active and intentional.</p>
+              <a href="pages/explore.html" class="text-link">Explore today's catalog context</a>
+            </article>
+            <article class="feature-card reveal-on-scroll">
+              <p class="section-kicker">Start here</p>
+              <h2>New to astronomy? Begin with light, then classification, then stellar lives.</h2>
+              <p>The Learn page now offers a clear beginner route that gradually expands from basics into scale, navigation, and scientific reasoning.</p>
+              <a href="pages/learn.html#path-understanding-starlight" class="text-link">Start here</a>
             </article>
           </div>
         </section>
@@ -165,18 +141,15 @@
         <div class="container footer-grid">
           <div>
             <a class="brand brand-footer" href="index.html">Heavens</a>
-            <p>
-              An elegant, approachable astronomy experience focused on stars, starlight, and the science of the night sky.
-            </p>
+            <p>An elegant, approachable astronomy platform focused on stars, starlight, and the science of the night sky.</p>
           </div>
           <div>
             <p class="footer-heading">Navigate</p>
             <ul>
               <li><a href="pages/explore.html">Explore</a></li>
+              <li><a href="pages/discover.html">Discover</a></li>
+              <li><a href="pages/learn.html">Learn</a></li>
               <li><a href="pages/sky-viewer.html">Sky Viewer</a></li>
-              <li><a href="pages/science-of-starlight.html">Science of Starlight</a></li>
-              <li><a href="pages/star-life-cycles.html">Star Life Cycles</a></li>
-              <li><a href="pages/about.html">About</a></li>
             </ul>
           </div>
           <div>

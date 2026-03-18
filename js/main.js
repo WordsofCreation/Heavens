@@ -8,21 +8,22 @@ import {
   renderFeaturedObject,
   renderScienceInsights,
   renderSkyViewerPanel,
-  renderFeaturedRegions
+  renderFeaturedRegions,
+  renderObjectPage,
+  renderDiscoverPage,
+  renderLearnPage
 } from './star-renderer.js';
-import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects } from './services/object-service.js';
+import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects, getObjectPageData } from './services/object-service.js';
 import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './services/external-data-service.js';
 import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
+import { getDiscoverModules, getLearningPaths, getScienceTopics, getStartHereGuide } from './services/science-content-service.js';
+import { toAbsolutePath } from './path-utils.js';
 
 setupNavigation();
 setupRevealAnimations();
 buildConstellationViewer();
 
 const page = document.body.dataset.page;
-
-function getBasePrefix() {
-  return window.location.pathname.includes('/pages/') ? '..' : '.';
-}
 
 async function initExplore(objects) {
   const searchInput = document.getElementById('search-input');
@@ -58,7 +59,7 @@ async function initExplore(objects) {
   };
 
   const openSkyViewer = (id) => {
-    window.location.href = `${getBasePrefix()}/pages/sky-viewer.html?object=${id}`;
+    window.location.href = toAbsolutePath(`pages/sky-viewer.html?object=${id}`);
   };
 
   const openObject = async (object) => {
@@ -163,11 +164,9 @@ async function initSkyViewer(objects) {
   renderFeaturedRegions(await getFeaturedRegions(), featuredRegions);
 
   let api = null;
-  let activeObject = null;
   const integrationStatus = getFutureIntegrationStatus();
 
   const selectObject = async (object) => {
-    activeObject = object;
     emptyState.hidden = true;
     guidance.hidden = true;
     viewerStatus.textContent = `Centering on ${object.name}…`;
@@ -230,22 +229,50 @@ async function initSkyViewer(objects) {
   }
 }
 
+async function initObjectPage() {
+  const target = document.getElementById('object-page-content');
+  const objectId = document.body.dataset.objectId;
+  if (!target || !objectId) return;
+
+  const pageData = await getObjectPageData(objectId);
+  if (!pageData) {
+    target.innerHTML = '<section class="section"><div class="container"><p>Unable to load this object right now.</p></div></section>';
+    return;
+  }
+
+  renderObjectPage(pageData, target);
+}
+
+async function initDiscoverPage(objects) {
+  const target = document.getElementById('discover-page-content');
+  if (!target) return;
+
+  const [modules, topics] = await Promise.all([getDiscoverModules(), getScienceTopics()]);
+  renderDiscoverPage({ modules, topics, objects }, target);
+}
+
+async function initLearnPage(objects) {
+  const target = document.getElementById('learn-page-content');
+  if (!target) return;
+
+  const [paths, topics, startHere] = await Promise.all([getLearningPaths(), getScienceTopics(), getStartHereGuide()]);
+  renderLearnPage({ paths, topics, startHere, objects }, target);
+}
+
 async function init() {
   const objects = await getAstronomyObjects();
   renderFeaturedObject(objects);
 
-  if (page === 'explore') {
-    await initExplore(objects);
-  }
-
-  if (page === 'sky-viewer') {
-    await initSkyViewer(objects);
-  }
+  if (page === 'explore') await initExplore(objects);
+  if (page === 'sky-viewer') await initSkyViewer(objects);
+  if (page === 'object-detail') await initObjectPage();
+  if (page === 'discover') await initDiscoverPage(objects);
+  if (page === 'learn') await initLearnPage(objects);
 }
 
 init().catch((error) => {
   console.error(error);
-  const container = document.querySelector('[data-featured-object]') || document.getElementById('catalog-grid') || document.getElementById('sky-object-panel');
+  const container = document.querySelector('[data-featured-object]') || document.getElementById('catalog-grid') || document.getElementById('sky-object-panel') || document.getElementById('object-page-content');
   if (container) {
     container.innerHTML = '<p>Unable to load astronomy data right now.</p>';
   }

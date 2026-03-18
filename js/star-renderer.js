@@ -1,3 +1,5 @@
+import { toAbsolutePath } from './path-utils.js';
+
 function formatTemperature(value) {
   return value ? `${value.toLocaleString()} K` : '—';
 }
@@ -25,15 +27,72 @@ function distanceMeter(object) {
 }
 
 function temperatureSwatch(object) {
-  return `<span class="temp-swatch" style="--object-color:${object.color?.includes('red') ? '#ff8d7a' : object.color?.includes('orange') || object.color?.includes('gold' ) || object.color?.includes('yellow') ? '#f0c97b' : object.color?.includes('blue') ? '#87abff' : '#edf2ff'}"></span>`;
+  return `<span class="temp-swatch" style="--object-color:${object.color?.includes('red') ? '#ff8d7a' : object.color?.includes('orange') || object.color?.includes('gold') || object.color?.includes('yellow') ? '#f0c97b' : object.color?.includes('blue') ? '#87abff' : '#edf2ff'}"></span>`;
 }
 
 function scienceInsightCard(card) {
   return `
-    <article class="science-insight-card">
+    <article class="science-insight-card mini-panel">
       <p class="eyebrow">Science insight</p>
       <h3>${card.title}</h3>
       <p>${card.body}</p>
+    </article>
+  `;
+}
+
+function objectLink(object) {
+  return toAbsolutePath(`pages/objects/${object.id}.html`);
+}
+
+function skyLink(id) {
+  return toAbsolutePath(`pages/sky-viewer.html?object=${id}`);
+}
+
+function learnTopicLink(topic) {
+  return toAbsolutePath(topic.pageHref);
+}
+
+function topicChip(topic) {
+  return `<a class="tag tag-link" href="${learnTopicLink(topic)}">${topic.title}</a>`;
+}
+
+function relatedObjectCard(object, eyebrow = 'Related object') {
+  return `
+    <article class="feature-card related-card">
+      <p class="section-kicker">${eyebrow}</p>
+      <h3>${object.name}</h3>
+      <p>${object.summary}</p>
+      <div class="catalog-meta">
+        <span class="tag">${object.type}</span>
+        <span>${object.constellation}</span>
+        <span>${object.distance}</span>
+      </div>
+      <div class="stacked-links">
+        <a class="text-link" href="${objectLink(object)}">Open object page</a>
+        <a class="text-link" href="${skyLink(object.id)}">Explore in Sky Viewer</a>
+      </div>
+    </article>
+  `;
+}
+
+function readingCard(card) {
+  return `
+    <article class="feature-card reading-card">
+      <p class="section-kicker">${card.kind}</p>
+      <h3>${card.title}</h3>
+      <p>${card.description}</p>
+      <a class="text-link" href="${card.href}">${card.label}</a>
+    </article>
+  `;
+}
+
+function topicCard(topic) {
+  return `
+    <article class="feature-card topic-card">
+      <p class="section-kicker">${topic.tag}</p>
+      <h3>${topic.title}</h3>
+      <p>${topic.description || topic.summary}</p>
+      <a class="text-link" href="${learnTopicLink(topic)}">Explore this topic</a>
     </article>
   `;
 }
@@ -61,7 +120,9 @@ function objectCardTemplate(object, selectedIds) {
         ${distanceMeter(object)}
       </div>
       <p>${object.summary}</p>
+      <div class="catalog-chip-row">${(object.relatedTopicCards || []).slice(0, 3).map(topicChip).join('')}</div>
       <div class="catalog-card-actions">
+        <a class="button button-ghost" href="${objectLink(object)}">Open object page</a>
         <button class="button button-ghost" type="button" data-view-sky="${object.id}">View in Sky Viewer</button>
       </div>
     </article>
@@ -90,8 +151,8 @@ function detailTemplate(object, progressiveSummary) {
         </div>
       </div>
       <div class="detail-actions">
-        <a class="button button-primary" href="sky-viewer.html?object=${object.id}">View in Sky Viewer</a>
-        <p class="detail-coordinates">Sky position: ${object.coordinatesLabel}</p>
+        <a class="button button-primary" href="${objectLink(object)}">Open full object page</a>
+        <a class="button button-secondary" href="${skyLink(object.id)}">View in Sky Viewer</a>
       </div>
       <div class="detail-list">
         <div><strong>Type</strong><p>${object.type}</p></div>
@@ -121,9 +182,9 @@ function detailTemplate(object, progressiveSummary) {
         </div>
       </section>
       <section class="mini-panel">
-        <h3>Size and scale</h3>
-        <p>${object.sizeNotes}</p>
-        ${distanceMeter(object)}
+        <h3>Continue on the full object page</h3>
+        <p>${object.introDescription}</p>
+        <div class="catalog-chip-row">${(object.relatedTopicCards || []).slice(0, 4).map(topicChip).join('')}</div>
       </section>
       ${progressiveSummary ? `
         <section class="mini-panel">
@@ -193,7 +254,7 @@ export function renderCatalog(objects, elements, selectedIds) {
 
   grid.querySelectorAll('.catalog-card').forEach((card) => {
     const handler = (event) => {
-      if (event?.target?.closest('.compare-toggle, [data-view-sky]')) return;
+      if (event?.target?.closest('.compare-toggle, [data-view-sky], a')) return;
       const object = objects.find((item) => item.id === card.dataset.objectId);
       onSelect(object);
     };
@@ -225,16 +286,16 @@ export function renderComparison(objects, element) {
 export function renderFeaturedObject(objects) {
   const card = document.querySelector('[data-featured-object]');
   const spotlight = document.querySelector('[data-home-featured-spotlight]');
-  if ((!card && !spotlight) || !objects.length) return;
+  const objectOfDay = document.querySelector('[data-object-of-day]');
+  if ((!card && !spotlight && !objectOfDay) || !objects.length) return;
 
   const now = new Date();
   const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 0));
   const diff = now - start;
   const day = Math.floor(diff / 86400000);
   const featured = objects[day % objects.length];
-  const base = window.location.pathname.includes('/pages/') ? '../' : '';
-  const detailHref = `${base}pages/explore.html?object=${featured.id}`;
-  const skyHref = `${base}pages/sky-viewer.html?object=${featured.id}`;
+  const detailHref = objectLink(featured);
+  const skyHref = skyLink(featured.id);
 
   if (card) {
     card.innerHTML = `
@@ -247,7 +308,7 @@ export function renderFeaturedObject(objects) {
         <span>${featured.distance}</span>
       </div>
       <div class="stacked-links">
-        <a class="text-link" href="${detailHref}">Open full detail view</a>
+        <a class="text-link" href="${detailHref}">Open full object page</a>
         <a class="text-link" href="${skyHref}">See it in Sky Viewer</a>
       </div>
     `;
@@ -255,7 +316,7 @@ export function renderFeaturedObject(objects) {
 
   if (spotlight) {
     spotlight.innerHTML = `
-      <p class="section-kicker">Tonight's Featured Wonder</p>
+      <p class="section-kicker">Today's featured object</p>
       <h2>${featured.name}</h2>
       <p>${featured.summary}</p>
       <div class="catalog-meta">
@@ -270,6 +331,19 @@ export function renderFeaturedObject(objects) {
       </div>
     `;
   }
+
+  if (objectOfDay) {
+    objectOfDay.innerHTML = `
+      <p class="section-kicker">Featured object of the day</p>
+      <h2>${featured.name}</h2>
+      <p>${featured.introDescription}</p>
+      <div class="catalog-chip-row">${(featured.relatedTopicCards || []).slice(0, 3).map(topicChip).join('')}</div>
+      <div class="stacked-links">
+        <a class="text-link" href="${detailHref}">Open the object page</a>
+        <a class="text-link" href="${skyHref}">Explore in the Sky Viewer</a>
+      </div>
+    `;
+  }
 }
 
 export function renderContextualInsight(objects, element, category) {
@@ -278,12 +352,17 @@ export function renderContextualInsight(objects, element, category) {
   const hottest = [...objects].filter((object) => object.temperatureK).sort((a, b) => b.temperatureK - a.temperatureK)[0];
   const message = category !== 'all'
     ? `You are viewing ${category.toLowerCase()}. Watch how shared categories can still hide very different distances, colors, and brightness levels.`
-    : `Across the full explorer, ${nearest?.name || 'nearby stars'} shows how nearness affects visibility, while ${hottest?.name || 'hot stars'} demonstrates how blue-white light often signals higher temperature.`;
+    : 'Use the catalog like a science playground: compare nearby stars, giant evolved stars, and deep-sky regions to build intuition for scale and classification.';
 
   element.innerHTML = `
-    <p class="eyebrow">Science layer</p>
-    <h2>Context for this view</h2>
+    <p class="eyebrow">In context</p>
+    <h2>Read the catalog scientifically</h2>
     <p>${message}</p>
+    <ul class="fact-list">
+      <li>Nearest in view: <strong>${nearest?.name || '—'}</strong> at ${nearest?.distance || '—'}.</li>
+      <li>Hottest in view: <strong>${hottest?.name || '—'}</strong> at ${formatTemperature(hottest?.temperatureK)}.</li>
+      <li>Open any object page to move from a quick catalog card into a full research-and-learning view.</li>
+    </ul>
   `;
 }
 
@@ -292,61 +371,257 @@ export function renderScienceInsights(cards, element) {
   element.innerHTML = cards.map(scienceInsightCard).join('');
 }
 
-export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus, progressiveSummary }, element) {
+export function renderFeaturedRegions(regions, element) {
   if (!element) return;
-  if (!object) {
-    element.innerHTML = `
-      <div class="sky-panel-empty">
-        <p class="eyebrow">Choose a target</p>
-        <h2>Select an object from the catalog</h2>
-        <p>Search for a star, nebula, or galaxy from the local dataset to center the viewer and add a marker.</p>
+  element.innerHTML = regions.map((region) => `
+    <article class="feature-card">
+      <p class="section-kicker">Featured region</p>
+      <h3>${region.title}</h3>
+      <p>${region.description}</p>
+      <div class="catalog-chip-row">
+        ${region.objects.map((object) => `<a class="tag tag-link" href="${objectLink(object)}">${object.name}</a>`).join('')}
       </div>
-    `;
-    return;
-  }
+    </article>
+  `).join('');
+}
 
-  element.innerHTML = `
-    <article class="sky-object-panel">
-      <p class="eyebrow">Selected object</p>
+export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus, progressiveSummary }, panel) {
+  panel.innerHTML = `
+    <article class="detail-article">
+      <p class="eyebrow">Sky Viewer focus</p>
       <h2>${object.name}</h2>
-      <p class="detail-lead">${object.summary}</p>
-      <div class="catalog-meta">
-        <span class="tag">${object.type}</span>
-        <span>${object.constellation}</span>
-        <span>${object.coordinatesLabel}</span>
+      <p>${object.skyGuide}</p>
+      <div class="detail-list">
+        ${object.keyFacts.map((fact) => `<div><strong>${fact.label}</strong><p>${fact.value}</p></div>`).join('')}
       </div>
-      <section class="mini-panel inline-panel">
-        <h3>Short science summary</h3>
-        <p>${object.lightStory}</p>
+      <section class="mini-panel">
+        <h3>What we learn from its light</h3>
+        <p>${object.whatWeLearnFromItsLight}</p>
       </section>
-      <section class="mini-panel inline-panel">
-        <h3>Observed Through Light</h3>
-        <p>${object.observedThroughLight?.spectralInfo || object.lightStory}</p>
+      <section class="mini-panel">
+        <h3>Explore next</h3>
+        <div class="card-grid three-up compact-grid">
+          ${relatedObjects.map((related) => relatedObjectCard(related)).join('')}
+        </div>
       </section>
-      ${progressiveSummary ? `<section class="mini-panel inline-panel"><h3>Live enhancement</h3><p>${progressiveSummary.extract}</p></section>` : ''}
-      <section class="mini-panel inline-panel">
-        <h3>Related objects nearby</h3>
-        <ul class="related-list">
-          ${relatedObjects.map((item) => `<li><strong>${item.name}</strong><span>${item.angularDistance}</span></li>`).join('') || '<li>No nearby matches in the current local dataset.</li>'}
+      ${progressiveSummary ? `
+        <section class="mini-panel">
+          <h3>Progressive live context</h3>
+          <p>${progressiveSummary.extract}</p>
+        </section>` : ''}
+      <section class="mini-panel">
+        <h3>Future research integrations</h3>
+        <ul class="fact-list">
+          ${integrationStatus.map((service) => `<li><strong>${service.label}</strong>: ${service.description} <span class="text-soft">(${service.status})</span></li>`).join('')}
         </ul>
-      </section>
-      <section class="integration-list">
-        <p class="eyebrow">Future integrations</p>
-        ${integrationStatus.map((service) => `<div><strong>${service.label}</strong><p>${service.status}. ${service.enabled ? 'Adapter can be wired without changing the viewer shell.' : 'Config stub is ready for a future client-side adapter.'}</p></div>`).join('')}
       </section>
     </article>
   `;
 }
 
-export function renderFeaturedRegions(regions, element) {
-  if (!element) return;
-  element.innerHTML = regions.map((region) => `
-    <article class="feature-card">
-      <p class="section-kicker">Featured Region of the Sky</p>
-      <h2>${region.title.replace('Featured Region of the Sky: ', '')}</h2>
-      <p>${region.description}</p>
-      <div class="catalog-meta">${region.objects.map((object) => `<span class="tag">${object.name}</span>`).join('')}</div>
-      <a class="text-link" href="../pages/sky-viewer.html?object=${region.objects[0]?.id || ''}">Open this region in Sky Viewer</a>
-    </article>
-  `).join('');
+export function renderObjectPage(pageData, element) {
+  const { object, relatedObjects, relatedTopics, furtherReading, researchInspiration, observeNext, featuredQuestion } = pageData;
+  document.title = `${object.name} | Heavens`;
+
+  element.innerHTML = `
+    <section class="object-hero hero object-page-hero">
+      <div class="container object-hero-grid">
+        <div class="reveal-on-scroll is-visible">
+          <p class="eyebrow">Dedicated object page</p>
+          <h1>${object.name}</h1>
+          <p class="hero-text">${object.introDescription}</p>
+          <div class="catalog-meta">
+            <span class="tag">${object.type}</span>
+            <span>${object.constellation}</span>
+            <span>${object.distance}</span>
+          </div>
+          <div class="hero-actions">
+            <a class="button button-primary" href="${skyLink(object.id)}">Explore in the Sky Viewer</a>
+            <a class="button button-secondary" href="${toAbsolutePath('pages/explore.html?object=' + object.id)}">Open in Explore</a>
+          </div>
+        </div>
+        <aside class="key-fact-panel reveal-on-scroll is-visible">
+          <p class="section-kicker">Key facts</p>
+          <div class="fact-panel-grid">
+            ${object.keyFacts.map((fact) => `<div><strong>${fact.label}</strong><p>${fact.value}</p></div>`).join('')}
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container object-content-grid">
+        <div class="object-main-column">
+          <section class="reading-surface reveal-on-scroll is-visible">
+            <p class="section-kicker">Introduction</p>
+            <h2>${object.name} at a glance</h2>
+            <p>${object.summary}</p>
+            <p>${object.sizeNotes}</p>
+            <div class="catalog-chip-row">${relatedTopics.map(topicChip).join('')}</div>
+          </section>
+
+          <section class="reading-surface reveal-on-scroll is-visible">
+            <p class="section-kicker">What We Learn from Its Light</p>
+            <h2>Light turns appearance into evidence</h2>
+            <p>${object.whatWeLearnFromItsLight}</p>
+            <div class="qa-callout">
+              <h3>Question worth asking</h3>
+              <p>${featuredQuestion?.description || 'How do astronomers transform a beautiful point of light into a measurable physical object?'}</p>
+            </div>
+          </section>
+
+          <section class="reading-surface reveal-on-scroll is-visible">
+            <p class="section-kicker">How It Fits in the Universe</p>
+            <h2>Context matters as much as appearance</h2>
+            <p>${object.howItFitsInTheUniverse}</p>
+          </section>
+
+          <section class="reading-surface reveal-on-scroll is-visible">
+            <p class="section-kicker">Why Astronomers Care About It</p>
+            <h2>Scientific value beyond visual appeal</h2>
+            <p>${object.whyAstronomersCare}</p>
+          </section>
+
+          <section class="section-block reveal-on-scroll is-visible">
+            <div class="section-heading-row">
+              <div>
+                <p class="section-kicker">Related reading</p>
+                <h2>Further reading, research inspiration, and connected topics</h2>
+              </div>
+            </div>
+            <div class="card-grid three-up compact-grid">
+              ${[...furtherReading, ...researchInspiration].map(readingCard).join('')}
+              ${relatedTopics.map(topicCard).join('')}
+            </div>
+          </section>
+        </div>
+
+        <aside class="object-side-column">
+          <section class="mini-panel reveal-on-scroll is-visible">
+            <p class="section-kicker">Observe this next</p>
+            <div class="stacked-recommendations">
+              ${observeNext.map((item) => `
+                <article class="recommendation-card">
+                  <h3>${item.title}</h3>
+                  <p>${item.description}</p>
+                  <a class="text-link" href="${item.href}">${item.label}</a>
+                </article>
+              `).join('')}
+            </div>
+          </section>
+
+          <section class="mini-panel reveal-on-scroll is-visible">
+            <p class="section-kicker">Related Objects</p>
+            <div class="stacked-recommendations">
+              ${relatedObjects.map((related) => `
+                <article class="recommendation-card">
+                  <h3>${related.name}</h3>
+                  <p>${related.angularDistance}. ${related.summary}</p>
+                  <a class="text-link" href="${objectLink(related)}">Open object page</a>
+                </article>
+              `).join('')}
+            </div>
+          </section>
+
+          <section class="mini-panel reveal-on-scroll is-visible">
+            <p class="section-kicker">If you liked this, explore…</p>
+            <div class="stacked-links">
+              <a class="text-link" href="${toAbsolutePath('pages/discover.html')}">Go to Discover</a>
+              <a class="text-link" href="${toAbsolutePath('pages/learn.html')}">Follow a learning pathway</a>
+              <a class="text-link" href="${skyLink(object.id)}">Explore in the Sky Viewer</a>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+export function renderDiscoverPage({ modules, topics, objects }, element) {
+  element.innerHTML = `
+    <section class="container page-intro reveal-on-scroll is-visible">
+      <p class="eyebrow">Discover</p>
+      <h1>A science-driven hub for curiosity, questions, and research pathways.</h1>
+      <p>Discover brings together featured objects, cosmic questions, spectral science, deep-sky highlights, and research-oriented prompts that can later connect to live public archives without changing the presentation layer.</p>
+    </section>
+    <section class="container card-grid three-up compact-grid">
+      ${modules.map((module) => {
+        const linkedObjects = (module.objectIds || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean);
+        const linkedTopics = (module.topicIds || []).map((id) => topics.find((topic) => topic.id === id)).filter(Boolean);
+        return `
+          <article class="feature-card reveal-on-scroll is-visible" id="${module.id}">
+            <p class="section-kicker">${module.type}</p>
+            <h2>${module.title}</h2>
+            <p>${module.description}</p>
+            <div class="catalog-chip-row">
+              ${linkedObjects.map((object) => `<a class="tag tag-link" href="${objectLink(object)}">${object.name}</a>`).join('')}
+              ${linkedTopics.map((topic) => `<a class="tag tag-link" href="${learnTopicLink(topic)}">${topic.title}</a>`).join('')}
+            </div>
+            <a class="text-link" href="${toAbsolutePath(module.ctaHref)}">${module.ctaLabel}</a>
+          </article>
+        `;
+      }).join('')}
+    </section>
+    <section class="container section-block reveal-on-scroll is-visible">
+      <div class="section-heading-row">
+        <div>
+          <p class="section-kicker">Explore by science topic</p>
+          <h2>Build a connected knowledge web</h2>
+        </div>
+      </div>
+      <div class="card-grid three-up compact-grid">
+        ${topics.map(topicCard).join('')}
+      </div>
+    </section>
+  `;
+}
+
+export function renderLearnPage({ paths, topics, startHere, objects }, element) {
+  element.innerHTML = `
+    <section class="container page-intro reveal-on-scroll is-visible">
+      <p class="eyebrow">Learn</p>
+      <h1>Guided astronomy pathways for building understanding step by step.</h1>
+      <p>Learn is a self-guided science experience that connects approachable explanations with real objects from the catalog, helping the site feel like a connected astronomy curriculum rather than a collection of isolated pages.</p>
+    </section>
+    <section class="container highlight-banner reveal-on-scroll is-visible">
+      <div>
+        <p class="section-kicker">${startHere.title}</p>
+        <h2>A guided beginner route into the night sky</h2>
+        <p>${startHere.description}</p>
+      </div>
+      <div class="stacked-links">
+        ${startHere.steps.map((step) => `<a class="text-link" href="${toAbsolutePath(step.href)}">${step.label}</a>`).join('')}
+      </div>
+    </section>
+    <section class="container learning-layout">
+      ${paths.map((path, index) => {
+        const pathTopics = (path.relatedTopicIds || []).map((id) => topics.find((topic) => topic.id === id)).filter(Boolean);
+        const examples = (path.exampleObjectIds || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean);
+        return `
+          <article class="learning-path reading-surface reveal-on-scroll is-visible" id="path-${path.id}">
+            <div class="learning-path-header">
+              <div>
+                <p class="section-kicker">${path.eyebrow}</p>
+                <h2>${path.title}</h2>
+              </div>
+              <p class="learning-path-summary">${path.summary}</p>
+            </div>
+            <div class="educational-grid">
+              ${path.sections.map((section) => `<section class="mini-panel"><h3>${section.title}</h3><p>${section.body}</p></section>`).join('')}
+            </div>
+            <div class="learning-links-row">
+              <div>
+                <h3>Related topics</h3>
+                <div class="catalog-chip-row">${pathTopics.map(topicChip).join('')}</div>
+              </div>
+              <div>
+                <h3>Example objects</h3>
+                <div class="catalog-chip-row">${examples.map((object) => `<a class="tag tag-link" href="${objectLink(object)}">${object.name}</a>`).join('')}</div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('')}
+    </section>
+  `;
 }

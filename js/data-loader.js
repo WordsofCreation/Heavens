@@ -1,8 +1,17 @@
-export async function loadObjects() {
-  const base = window.location.pathname.includes('/pages/') ? '..' : '.';
-  const response = await fetch(`${base}/data/objects.json`);
+import { getBasePrefix } from './path-utils.js';
+
+async function loadJson(path) {
+  const response = await fetch(`${getBasePrefix()}/${path}`);
   if (!response.ok) {
-    throw new Error('Unable to load astronomy objects.');
+    throw new Error(`Unable to load ${path}.`);
   }
   return response.json();
+}
+
+export async function loadObjects() {
+  return loadJson('data/objects.json');
+}
+
+export async function loadScienceContent() {
+  return loadJson('data/science-content.json');
 }

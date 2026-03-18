@@ -417,3 +417,81 @@ select, input, button { font: inherit; }
   .observed-grid, .science-insight-grid { grid-template-columns: 1fr; }
   .aladin-lite-shell { min-height: 380px; }
 }
+.button-ghost {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--line);
+  color: var(--text);
+}
+.catalog-card-actions, .stacked-links, .catalog-chip-row, .learning-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.catalog-card-actions { margin-top: 1rem; }
+.catalog-chip-row { margin-top: 1rem; }
+.tag-link { border: 1px solid rgba(240,210,138,0.22); }
+.tag-link:hover, .tag-link:focus-visible { background: rgba(240,210,138,0.22); }
+.highlight-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.4rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(240,210,138,0.08), rgba(135,171,255,0.08));
+  box-shadow: var(--shadow);
+}
+.object-page-hero { padding: 4rem 0 2rem; }
+.object-hero-grid, .object-content-grid, .learning-layout {
+  display: grid;
+  gap: 1.5rem;
+}
+.object-hero-grid { grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr); align-items: start; }
+.object-content-grid { grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr); }
+.object-main-column, .object-side-column { display: grid; gap: 1.25rem; align-content: start; }
+.reading-surface, .key-fact-panel, .learning-path {
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+}
+.fact-panel-grid, .stacked-recommendations {
+  display: grid;
+  gap: 0.9rem;
+}
+.fact-panel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.recommendation-card {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.qa-callout {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--gold);
+  border-radius: 0.85rem;
+  background: rgba(240,210,138,0.08);
+}
+.section-block { display: grid; gap: 1rem; }
+.section-heading-row { display: flex; justify-content: space-between; gap: 1rem; align-items: end; }
+.learning-path-header { display: flex; justify-content: space-between; gap: 1.5rem; align-items: start; margin-bottom: 1rem; }
+.learning-path-summary { max-width: 36ch; }
+.related-card, .topic-card, .reading-card { height: 100%; }
+.text-soft { color: var(--text-soft); }
+
+@media (max-width: 1080px) {
+  .four-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .object-hero-grid, .object-content-grid, .footer-grid, .hero-grid, .explore-layout { grid-template-columns: 1fr; }
+  .featured-home-grid, .science-strip, .three-up { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .highlight-banner, .learning-path-header, .section-heading-row { flex-direction: column; align-items: start; }
+  .catalog-grid, .comparison-grid, .detail-list, .detail-insight-grid, .educational-grid, .branch-grid, .fact-panel-grid { grid-template-columns: 1fr; }
+  .site-nav { display: none; position: absolute; top: calc(100% + 0.5rem); right: 1rem; left: 1rem; padding: 1rem; border-radius: var(--radius); background: rgba(5,8,22,0.98); border: 1px solid var(--line); box-shadow: var(--shadow); flex-direction: column; align-items: start; }
+  .site-nav.is-open { display: flex; }
+  .nav-toggle { display: block; }
+}
