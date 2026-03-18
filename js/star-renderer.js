@@ -857,12 +857,19 @@ export function renderLearnPage({ paths, topics, startHere, objects, journeyStep
 export function renderHomepageExperience(objects) {
   const preview = document.querySelector('[data-home-observatory]');
   if (!preview || !objects?.length) return;
+
   const sample = ['sirius', 'betelgeuse', 'vega', 'polaris']
     .map((id) => objects.find((object) => object.id === id))
     .filter(Boolean)
     .map((object) => `<li><strong>${object.name}</strong> · ${object.constellation} · ${object.type}</li>`)
     .join('');
-  preview.innerHTML = `<ul class="observatory-mini-list">${sample}</ul>`;
+
+  if (!sample) return;
+
+  preview.innerHTML = `
+    <p class="section-kicker">Preview targets</p>
+    <ul class="observatory-mini-list">${sample}</ul>
+  `;
 }
 
 export function renderObservatoryPage({ skyNodes, journeys, regions, storyPanels, tonightJourney }, element) {
