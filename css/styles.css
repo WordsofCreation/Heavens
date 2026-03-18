@@ -791,3 +791,27 @@ select, input, button { font: inherit; }
   .recent-object-actions { display: flex; flex-wrap: wrap; }
 }
 .recent-object-card.is-journey { border-color: rgba(240,210,138,0.18); }
+
+
+.recent-comparison-list,
+.topic-insight-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.recent-comparison-card,
+.topic-insight-card {
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.topic-journey-panel,
+.topic-comparison-panel,
+.recent-comparisons-panel {
+  display: grid;
+  gap: 1rem;
+}

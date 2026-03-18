@@ -1,5 +1,5 @@
 import { toAbsolutePath } from './path-utils.js';
-import { getJourneyContextLabel, getJourneyHref, getJourneysForObject } from './services/journey-map-service.js';
+import { getJourneyContextLabel, getJourneyHref, getJourneysForObject, getJourneysForTopic } from './services/journey-map-service.js';
 import { getComparisonRestoreUrl } from './services/journey-state-service.js';
 
 
@@ -68,6 +68,63 @@ export function renderRecentObjectsPanel({ items = [], title = 'Recent Objects',
 function renderComparisonPreview(objects = [], options = {}) {
   if (!objects.length) return '';
   return `<section class="comparison-preview mini-panel"><p class="section-kicker">Current comparison set</p><div class="catalog-chip-row">${objects.map((object) => `<span class="tag">${object.name}</span>`).join('')}</div>${options.message ? `<p>${options.message}</p>` : ''}</section>`;
+}
+
+
+export function renderRecentComparisonsPanel({ entries = [], objects = [], title = 'Recent Comparisons', emptyMessage = 'Comparison history will appear here once you compare two or more objects.', context = 'default' } = {}) {
+  return `
+    <section class="recent-comparisons-panel mini-panel" data-comparison-context="${context}">
+      <div class="recent-panel-header">
+        <div>
+          <p class="section-kicker">Comparison history</p>
+          <h3>${title}</h3>
+        </div>
+        <p>Restore your last side-by-side studies without rebuilding them.</p>
+      </div>
+      ${entries.length ? `<div class="recent-comparison-list">${entries.map((entry) => {
+        const matchedObjects = (entry.ids || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean);
+        const chips = matchedObjects.map((object) => `<span class="tag">${object.name}</span>`).join('');
+        return `<article class="recent-comparison-card"><div><p class="recent-object-topline"><span>${matchedObjects.length} object comparison</span></p><h4>${entry.label || matchedObjects.map((object) => object.name).join(' · ')}</h4><div class="catalog-chip-row">${chips}</div></div><div class="recent-object-actions"><a class="text-link" href="${getComparisonRestoreUrl((entry.ids || []).slice(0, 3), { restored: true, from: context })}">Restore comparison</a>${matchedObjects[0] ? `<a class="text-link" href="${objectLink(matchedObjects[0])}">Open first object</a>` : ''}</div></article>`;
+      }).join('')}</div>` : `<p class="text-soft">${emptyMessage}</p>`}
+    </section>
+  `;
+}
+
+export function renderTopicJourneyPanel({ topics = [], objects = [], title = 'Deepen by topic', eyebrow = 'Topic-deepening' } = {}) {
+  if (!topics.length) return '';
+  return `
+    <section class="topic-journey-panel mini-panel">
+      <div class="recent-panel-header">
+        <div>
+          <p class="section-kicker">${eyebrow}</p>
+          <h3>${title}</h3>
+        </div>
+        <p>Use connected topics and curated journeys to turn one object into a longer learning sequence.</p>
+      </div>
+      <div class="topic-insight-list">${topics.map((topic) => {
+        const journeys = getJourneysForTopic(topic.id).slice(0, 2);
+        const linkedObjects = (topic.relatedObjectIds || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean).slice(0, 3);
+        return `<article class="topic-insight-card"><p class="recent-object-topline"><span>${topic.tag || 'Topic'}</span></p><h4>${topic.title}</h4><p>${topic.summary || topic.description || ''}</p><div class="catalog-chip-row">${linkedObjects.map((object) => `<a class="tag tag-link" href="${objectLink(object)}">${object.name}</a>`).join('')}</div><div class="stacked-links">${journeys.map((journey) => `<a class="text-link" href="${getJourneyHref(journey)}">${journey.title}</a>`).join('')}<a class="text-link" href="${toAbsolutePath(topic.pageHref)}">Open topic path</a></div></article>`;
+      }).join('')}</div>
+    </section>
+  `;
+}
+
+export function renderTopicComparisonInsights({ object, compareCandidates = [], relatedTopics = [] } = {}) {
+  if (!object || !compareCandidates.length) return '';
+  return `
+    <section class="mini-panel topic-comparison-panel reveal-on-scroll is-visible">
+      <div class="recent-panel-header">
+        <div>
+          <p class="section-kicker">Topic-specific comparisons</p>
+          <h3>Compare ${object.name} with the right neighbors</h3>
+        </div>
+        <p>Each suggestion is tied to a science topic so comparison becomes part of a guided explanation.</p>
+      </div>
+      <div class="topic-insight-list">${compareCandidates.map((candidate) => `<article class="topic-insight-card"><p class="recent-object-topline"><span>${candidate.topic?.title || 'Comparison topic'}</span></p><h4>${candidate.object.name}</h4><p>${candidate.reason}</p><div class="catalog-chip-row">${(candidate.sharedTopics || []).map((topic) => `<a class="tag tag-link" href="${toAbsolutePath(topic.pageHref)}">${topic.title}</a>`).join('')}</div><div class="recent-object-actions"><a class="text-link" href="${getComparisonRestoreUrl([object.id, candidate.object.id], { restored: true, from: 'topic-insight' })}">Compare now</a><a class="text-link" href="${objectLink(candidate.object)}">Open object page</a></div></article>`).join('')}</div>
+      ${relatedTopics.length ? `<div class="catalog-chip-row">${relatedTopics.map((topic) => `<a class="tag tag-link" href="${toAbsolutePath(topic.pageHref)}">${topic.title}</a>`).join('')}</div>` : ''}
+    </section>
+  `;
 }
 
 function formatTemperature(value) {
@@ -571,7 +628,7 @@ export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus
 }
 
 export function renderObjectPage(pageData, element) {
-  const { object, relatedObjects, relatedTopics, furtherReading, researchInspiration, observeNext, featuredQuestion, journeyState, crossLinks } = pageData;
+  const { object, relatedObjects, relatedTopics, furtherReading, researchInspiration, observeNext, featuredQuestion, journeyState, crossLinks, recentComparisonsPanel, topicComparisonPanel } = pageData;
   document.title = `${object.name} | Heavens`;
 
   element.innerHTML = `
@@ -621,6 +678,8 @@ export function renderObjectPage(pageData, element) {
 
           ${journeyContinuationCard(journeyState, object)}
           ${pageData.recentPanel || ''}
+          ${recentComparisonsPanel || ''}
+          ${topicComparisonPanel || ''}
           <section class="reading-surface reveal-on-scroll is-visible">
             <p class="section-kicker">What We Learn from Its Light</p>
             <h2>Light turns appearance into evidence</h2>
