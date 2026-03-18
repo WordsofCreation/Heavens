@@ -9,11 +9,20 @@ export function setupNavigation() {
     nav.classList.toggle('is-open');
   });
 
-  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const normalizePath = (value) => (value || '').split('#')[0].split('?')[0].split('/').pop() || 'index.html';
+  const currentPath = normalizePath(window.location.pathname);
+  const fallbackPath = document.body.dataset.page === 'object-detail' ? 'explore.html' : null;
+
   nav.querySelectorAll('a').forEach((link) => {
     const href = link.getAttribute('href') || '';
-    if (href.endsWith(currentPath) || (currentPath === '' && href.endsWith('index.html'))) {
+    const linkPath = normalizePath(href);
+    const isActive = linkPath === currentPath || (fallbackPath && linkPath === fallbackPath);
+    if (isActive) {
       link.classList.add('is-active');
+      link.setAttribute('aria-current', 'page');
+    } else {
+      link.classList.remove('is-active');
+      link.removeAttribute('aria-current');
     }
     link.addEventListener('click', () => {
       nav.classList.remove('is-open');

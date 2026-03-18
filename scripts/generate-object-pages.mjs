@@ -17,6 +17,7 @@ const nav = `
           <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
             <a href="../../index.html">Home</a>
             <a href="../explore.html">Explore</a>
+            <a href="../observatory.html">Observatory Mode</a>
             <a href="../discover.html">Discover</a>
             <a href="../learn.html">Learn</a>
             <a href="../sky-viewer.html">Sky Viewer</a>
