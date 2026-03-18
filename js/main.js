@@ -14,14 +14,17 @@ import {
   renderLearnPage,
   renderObservatoryPage,
   renderHomepageExperience,
-  renderRecentObjectsPanel
+  renderRecentObjectsPanel,
+  renderRecentComparisonsPanel,
+  renderTopicComparisonInsights,
+  renderTopicJourneyPanel
 } from './star-renderer.js';
 import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects, getObjectPageData } from './services/object-service.js';
 import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './services/external-data-service.js';
 import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
 import { getDiscoverModules, getLearningPaths, getScienceTopics, getStartHereGuide } from './services/science-content-service.js';
 import { getObservatoryData } from './services/observatory-service.js';
-import { getJourneyById, getJourneysForObject, getStepState } from './services/journey-map-service.js';
+import { getJourneyById, getJourneysForObject, getLinkedTopicIdsForObject, getStepState } from './services/journey-map-service.js';
 import {
   buildCrossLinks,
   deriveComparisonStateFromUrl,
@@ -81,25 +84,77 @@ function buildContinueModule(label, href, description) {
   `;
 }
 
+function buildRecentComparisonsPanel(objects, options = {}) {
+  const state = loadJourneyState();
+  return renderRecentComparisonsPanel({
+    entries: (state.recentComparisons || []).slice(0, options.limit || 3),
+    objects,
+    title: options.title,
+    context: options.context,
+    emptyMessage: options.emptyMessage
+  });
+}
 
-function injectHomeJourneyResume() {
+function buildTopicDeepeningPanel(objects, topics, options = {}) {
+  const state = loadJourneyState();
+  const topicIds = new Set();
+  (state.lastObject?.scienceTopicIds || []).forEach((id) => topicIds.add(id));
+  (state.activeJourney?.objectIds || []).forEach((objectId) => {
+    const match = objects.find((object) => object.id === objectId);
+    (match?.scienceTopicIds || []).forEach((id) => topicIds.add(id));
+  });
+  const selectedTopics = [...topicIds]
+    .map((id) => topics.find((topic) => topic.id === id))
+    .filter(Boolean)
+    .slice(0, options.limit || 3);
+
+  return renderTopicJourneyPanel({
+    topics: selectedTopics.length ? selectedTopics : topics.slice(0, options.limit || 3),
+    objects,
+    title: options.title,
+    eyebrow: options.eyebrow
+  });
+}
+
+
+function injectHomeJourneyResume(objects, topics) {
   if (page !== 'home') return;
   const state = getJourneyResume();
   const grid = document.querySelector('.featured-home-grid');
-  if (!grid || !state?.lastObject) return;
-  const article = document.createElement('article');
-  article.className = 'feature-card reveal-on-scroll is-visible';
-  article.innerHTML = `
-    <p class="section-kicker">Resume your journey</p>
-    <h2>Pick up where you left off with ${state.lastObject.name}.</h2>
-    <p>${state.activeJourney ? `Continue the ${state.activeJourney.title} route, or reopen ${state.lastObject.name} in the view that best fits your next step.` : 'Your most recent object is ready to reopen across Explore, Observatory Mode, and the Sky Viewer.'}</p>
-    <div class="stacked-links">
-      <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).observatory}">Resume in Observatory Mode</a>
-      <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).skyViewer}">Open in Sky Viewer</a>
-      <a class="text-link" href="${state.lastObject.routeHints?.objectPage || buildCrossLinks(state.lastObject).objectPage}">Open object page</a>
-    </div>
-  `;
-  grid.prepend(article);
+  if (!grid) return;
+
+  if (state?.lastObject) {
+    const article = document.createElement('article');
+    article.className = 'feature-card reveal-on-scroll is-visible';
+    article.innerHTML = `
+      <p class="section-kicker">Resume your journey</p>
+      <h2>Pick up where you left off with ${state.lastObject.name}.</h2>
+      <p>${state.activeJourney ? `Continue the ${state.activeJourney.title} route, reopen a recent comparison, or branch into a topic linked to ${state.lastObject.name}.` : 'Your most recent object is ready to reopen across Explore, Observatory Mode, and the Sky Viewer.'}</p>
+      <div class="stacked-links">
+        <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).observatory}">Resume in Observatory Mode</a>
+        <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).skyViewer}">Open in Sky Viewer</a>
+        <a class="text-link" href="${state.lastObject.routeHints?.objectPage || buildCrossLinks(state.lastObject).objectPage}">Open object page</a>
+      </div>
+    `;
+    grid.prepend(article);
+  }
+
+  const comparisonArticle = document.createElement('article');
+  comparisonArticle.className = 'feature-card reveal-on-scroll is-visible';
+  comparisonArticle.innerHTML = buildRecentComparisonsPanel(objects, {
+    title: 'Recent comparison sets',
+    context: 'home',
+    emptyMessage: 'Build a comparison in Explore or on an object page, then restore it here.'
+  });
+  grid.appendChild(comparisonArticle);
+
+  const topicArticle = document.createElement('article');
+  topicArticle.className = 'feature-card reveal-on-scroll is-visible';
+  topicArticle.innerHTML = buildTopicDeepeningPanel(objects, topics, {
+    title: 'Recommended next topics',
+    eyebrow: 'Topic-deepening'
+  });
+  grid.appendChild(topicArticle);
 }
 
 async function initExplore(objects) {
@@ -587,7 +642,31 @@ async function initObjectPage() {
   }
 
   rememberObject(pageData.object, { mode: 'Object Page', source: new URLSearchParams(window.location.search).get('from') || 'Object Page' });
-  renderObjectPage({ ...pageData, journeyState: loadJourneyState(), recentPanel: buildRecentPanel({ title: 'Recent Objects', context: 'object-page', currentJourneyId: loadJourneyState().activeJourney?.id }), crossLinks: buildCrossLinks(pageData.object, { journeyId: loadJourneyState().activeJourney?.id, from: 'object-page' }) }, target);
+  const topics = await getScienceTopics();
+  const linkedTopicIds = getLinkedTopicIdsForObject(pageData.object).slice(0, 3);
+  const relatedTopics = linkedTopicIds.map((id) => topics.find((topic) => topic.id === id)).filter(Boolean);
+  const compareCandidates = relatedTopics.map((topic) => {
+    const candidate = (pageData.relatedObjects || []).find((related) => (related.scienceTopicIds || []).includes(topic.id));
+    if (!candidate) return null;
+    return {
+      topic,
+      object: candidate,
+      sharedTopics: relatedTopics.filter((item) => (candidate.scienceTopicIds || []).includes(item.id)).slice(0, 2),
+      reason: `${candidate.name} helps extend the ${topic.title.toLowerCase()} thread from ${pageData.object.name} into a clearer side-by-side comparison.`
+    };
+  }).filter(Boolean);
+  renderObjectPage({
+    ...pageData,
+    journeyState: loadJourneyState(),
+    recentPanel: buildRecentPanel({ title: 'Recent Objects', context: 'object-page', currentJourneyId: loadJourneyState().activeJourney?.id }),
+    recentComparisonsPanel: buildRecentComparisonsPanel([pageData.object, ...(pageData.relatedObjects || [])], {
+      title: 'Recent comparisons',
+      context: 'object-page',
+      emptyMessage: 'Use Compare this to save a two- or three-object comparison for quick return.'
+    }),
+    topicComparisonPanel: renderTopicComparisonInsights({ object: pageData.object, compareCandidates, relatedTopics }),
+    crossLinks: buildCrossLinks(pageData.object, { journeyId: loadJourneyState().activeJourney?.id, from: 'object-page' })
+  }, target);
 }
 
 async function initDiscoverPage(objects) {
@@ -618,7 +697,7 @@ async function init() {
   const objects = await getAstronomyObjects();
   renderFeaturedObject(objects);
   renderHomepageExperience(objects);
-  injectHomeJourneyResume();
+  injectHomeJourneyResume(objects, await getScienceTopics());
   document.body.dataset.storageAvailable = String(getStorageAvailability());
 
   if (page === 'explore') await initExplore(objects);
