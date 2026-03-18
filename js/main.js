@@ -480,6 +480,8 @@ async function initObservatory() {
     const metrics = storyMetrics(object);
     const journeyState = loadJourneyState();
     const links = buildCrossLinks(object, { journeyId: activeJourney?.id, from: 'observatory', regionId: region?.id || undefined, compareTo: 'sun' });
+    const journeyContinuationHref = activeJourney ? toAbsolutePath(activeJourney.pageHref) : null;
+    const journeyContinuationLabel = activeJourney?.kind === 'learning' ? 'Continue the learning thread' : 'Continue this guided journey';
     objectPanel.innerHTML = `
       <div class="observatory-object-card">
         <div class="observatory-object-topline">
@@ -516,7 +518,7 @@ async function initObservatory() {
           <article class="mini-panel nested-panel"><p class="section-kicker">Science lens</p><h3>${metrics.scienceBand}</h3><p>${object.importance}</p></article>
         </section>
         <section class="mini-panel nested-panel"><h3>What its light reveals</h3><p>${object.lightStory}</p></section>
-        <section class="mini-panel nested-panel"><h3>Journey continuity</h3><p>${journeyState.activeJourney ? `You are in the ${journeyState.activeJourney.title} path.` : 'Open a guided route to connect this target to a bigger sky story.'}</p><div class="stacked-links">${journeyState.activeJourney ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/learn.html#path-${journeyState.activeJourney.id}`)}\">Continue the learning thread</a>` : ''}<a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${links.objectPage}">Open full object page</a></div></section>
+        <section class="mini-panel nested-panel"><h3>Journey continuity</h3><p>${journeyState.activeJourney ? `You are in the ${journeyState.activeJourney.title} path.` : 'Open a guided route to connect this target to a bigger sky story.'}</p><div class="stacked-links">${journeyState.activeJourney && journeyContinuationHref ? `<a class=\"text-link\" href=\"${journeyContinuationHref}\">${journeyContinuationLabel}</a>` : ''}<a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${links.objectPage}">Open full object page</a></div></section>
         <section class="mini-panel nested-panel"><h3>Discovery actions</h3><div class="stacked-links"><a class="text-link" href="${links.skyViewer}">Open in Sky Viewer</a><a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${toAbsolutePath(`pages/discover.html`)}">Explore related science</a>${object.relatedObjectIds?.[0] ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/observatory.html?object=${object.relatedObjectIds[0]}&journey=${activeJourney?.id || ''}&from=related`)}\">Explore related objects</a>` : ''}<a class="text-link" href="${toAbsolutePath(`pages/objects/sun.html?compare=${object.id}`)}">Compare to the Sun</a></div></section>
         <section class="mini-panel nested-panel"><h3>Related science topics</h3><div class="catalog-chip-row">${relatedTopics}</div></section>
       </div>`;
