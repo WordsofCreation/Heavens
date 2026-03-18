@@ -65,16 +65,42 @@ const JOURNEY_COLLECTION = [
     objectIds: ['betelgeuse', 'bellatrix', 'rigel', 'orion-nebula', 'sirius', 'aldebaran'],
     recommendedTopicIds: ['sky-navigation', 'stellar-life-cycle'],
     recommendedObjectIds: ['betelgeuse', 'rigel', 'orion-nebula']
+  },
+  {
+    id: 'distance-ladder',
+    title: 'Distance Ladder Journey',
+    kind: 'learning',
+    theme: 'Scale and evidence',
+    pageHref: 'pages/learn.html#path-distances-in-space',
+    description: 'Move from the nearest stars to variable-star clues and galaxy-scale distance perspective.',
+    steps: ['Start', 'Explore', 'Measure', 'Compare', 'Observe', 'Continue'],
+    topicIds: ['distances-in-space', 'how-astronomers-know', 'sky-navigation'],
+    objectIds: ['sun', 'proxima-centauri', 'sirius', 'polaris', 'andromeda-galaxy'],
+    recommendedTopicIds: ['distances-in-space', 'how-astronomers-know'],
+    recommendedObjectIds: ['proxima-centauri', 'polaris', 'andromeda-galaxy']
+  },
+  {
+    id: 'summer-triangle',
+    title: 'Summer Triangle Journey',
+    kind: 'discovery',
+    theme: 'Seasonal comparison',
+    pageHref: 'pages/discover.html#spectral-spotlight',
+    description: 'Use Vega, Deneb, and Altair to compare brightness, distance, and stellar character within one easy sky pattern.',
+    steps: ['Start', 'Explore', 'Compare', 'Understand', 'Observe', 'Continue'],
+    topicIds: ['sky-navigation', 'understanding-starlight', 'distances-in-space'],
+    objectIds: ['vega', 'deneb', 'altair', 'polaris'],
+    recommendedTopicIds: ['sky-navigation', 'distances-in-space'],
+    recommendedObjectIds: ['vega', 'deneb', 'altair']
   }
 ];
 
 const TOPIC_JOURNEY_MAP = {
-  'understanding-starlight': ['understanding-starlight', 'stars-by-color'],
+  'understanding-starlight': ['understanding-starlight', 'stars-by-color', 'summer-triangle'],
   'stellar-classification': ['understanding-starlight', 'stars-by-color'],
   'stellar-life-cycle': ['stellar-evolution', 'winter-sky'],
-  'distances-in-space': ['brightest-stars', 'stellar-evolution'],
-  'sky-navigation': ['winter-sky', 'brightest-stars'],
-  'how-astronomers-know': ['understanding-starlight']
+  'distances-in-space': ['brightest-stars', 'stellar-evolution', 'distance-ladder', 'summer-triangle'],
+  'sky-navigation': ['winter-sky', 'brightest-stars', 'distance-ladder', 'summer-triangle'],
+  'how-astronomers-know': ['understanding-starlight', 'distance-ladder']
 };
 
 export function getJourneys() {
