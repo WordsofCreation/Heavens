@@ -495,3 +495,125 @@ select, input, button { font: inherit; }
   .site-nav.is-open { display: flex; }
   .nav-toggle { display: block; }
 }
+
+.two-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.preview-actions { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+.observatory-preview {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(135,171,255,0.18);
+  background: linear-gradient(135deg, rgba(10,17,38,0.92), rgba(17,25,56,0.78));
+  box-shadow: var(--shadow);
+}
+.observatory-mini-list { margin: 1rem 0 0; padding-left: 1.1rem; color: var(--text-muted); display: grid; gap: 0.4rem; }
+.observatory-main { padding-bottom: 4rem; }
+.observatory-hero { padding-bottom: 2.5rem; }
+.observatory-hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.8fr); gap: 1.5rem; align-items: center; }
+.observatory-side-panel { padding: 1.5rem; }
+.journey-step-list { margin: 1rem 0 0; padding-left: 1.15rem; color: var(--text-muted); display: grid; gap: 0.45rem; }
+.observatory-shell { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.82fr); gap: 1.4rem; align-items: start; }
+.observatory-stage {
+  position: relative;
+  min-height: 760px;
+  border-radius: 2rem;
+  overflow: hidden;
+  border: 1px solid rgba(135,171,255,0.16);
+  box-shadow: 0 32px 100px rgba(2, 6, 20, 0.62);
+  background: radial-gradient(circle at top, rgba(111,140,248,0.16), transparent 32%), #030713;
+}
+.observatory-stage::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  background: linear-gradient(180deg, transparent, rgba(3,6,16,0.9));
+  pointer-events: none;
+}
+.observatory-canvas { width: 100%; height: 100%; min-height: 760px; display: block; }
+.observatory-hud, .observatory-status-panel { position: absolute; z-index: 2; }
+.observatory-hud { inset: 1rem; pointer-events: none; }
+.observatory-chip-row, .observatory-hotspots { pointer-events: auto; }
+.observatory-chip-row { display: flex; flex-wrap: wrap; gap: 0.65rem; max-width: 70%; }
+.observatory-hotspots { position: absolute; inset: 0; }
+.observatory-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+}
+.observatory-hotspot-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #fff, var(--glow, #8fb0ff));
+  box-shadow: 0 0 18px var(--glow, rgba(143,176,255,0.8)), 0 0 40px color-mix(in srgb, var(--glow, #8fb0ff) 45%, transparent);
+}
+.observatory-hotspot.is-active .observatory-hotspot-dot { transform: scale(1.25); }
+.observatory-hotspot-label {
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(7, 12, 28, 0.76);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.observatory-status-panel { left: 1rem; right: 1rem; bottom: 1rem; max-width: 380px; }
+.observatory-sidebar { display: grid; gap: 1rem; }
+.observatory-panel-block { display: grid; gap: 1rem; }
+.compact-heading { align-items: center; }
+.observatory-object-topline { display: flex; align-items: center; gap: 0.85rem; }
+.observatory-badge-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+.observatory-detail-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nested-panel { margin-top: 1rem; background: rgba(255,255,255,0.025); }
+.journey-list { display: grid; gap: 0.75rem; }
+.journey-button {
+  text-align: left;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+.journey-button small { color: var(--text-soft); }
+.journey-button.is-selected, .journey-button:hover, .journey-button:focus-visible { border-color: rgba(240,210,138,0.4); background: rgba(240,210,138,0.08); }
+.journey-panel {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+.story-panel { min-height: 100%; }
+.tag-button { border: 1px solid rgba(240,210,138,0.22); background: transparent; color: var(--gold); cursor: pointer; }
+.tag-button:hover, .tag-button:focus-visible { background: rgba(240,210,138,0.12); }
+.constellation-card { min-height: 100%; }
+
+@media (max-width: 1080px) {
+  .observatory-hero-grid, .observatory-shell, .two-up { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .observatory-preview { flex-direction: column; align-items: start; }
+  .observatory-stage, .observatory-canvas { min-height: 560px; }
+  .observatory-chip-row { max-width: none; }
+  .observatory-status-panel { position: static; margin: 1rem; max-width: none; }
+  .observatory-hotspot-label { font-size: 0.72rem; }
+  .observatory-detail-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before, .button, .catalog-card, .observatory-hotspot-dot { animation: none !important; transition: none !important; }
+}
