@@ -682,3 +682,112 @@ select, input, button { font: inherit; }
 @media (max-width: 720px) {
   .stellar-class-header, .stellar-class-metrics { grid-template-columns: 1fr; }
 }
+
+.journey-steps-panel,
+.recent-objects-panel,
+.comparison-preview,
+.comparison-restore-notice,
+.continue-module {
+  border: 1px solid rgba(135,171,255,0.16);
+  background: linear-gradient(180deg, rgba(12,18,40,0.88), rgba(8,12,28,0.86));
+  backdrop-filter: blur(10px);
+}
+
+.journey-steps-header,
+.recent-panel-header {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.journey-step-indicator {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0;
+  margin: 0 0 0.8rem;
+}
+
+.journey-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-soft);
+  background: rgba(255,255,255,0.03);
+}
+.journey-step-pill.is-complete { color: var(--text); border-color: rgba(240,210,138,0.22); }
+.journey-step-pill.is-current { color: var(--text); border-color: rgba(135,171,255,0.42); box-shadow: 0 0 0 1px rgba(135,171,255,0.2), 0 12px 28px rgba(7,13,30,0.28); }
+.journey-step-pill.is-next { border-style: dashed; }
+.journey-step-index {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(255,255,255,0.08);
+  color: var(--gold);
+  font-size: 0.78rem;
+}
+.journey-step-meta { margin: 0; color: var(--text-soft); }
+
+.membership-cues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.membership-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.75rem 0.95rem;
+  border-radius: 1rem;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid rgba(135,171,255,0.18);
+  background: rgba(255,255,255,0.03);
+}
+.membership-chip span { color: var(--text-soft); font-size: 0.76rem; }
+
+.recent-object-list,
+.recent-object-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+.recent-object-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.recent-object-card:first-child { border-top: 0; padding-top: 0; }
+.recent-object-topline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  color: var(--text-soft);
+  margin-bottom: 0.35rem;
+}
+.recent-object-cue {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--cue-color, #edf2ff);
+  box-shadow: 0 0 18px var(--cue-color, #edf2ff);
+}
+.recent-object-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 720px) {
+  .journey-step-indicator,
+  .membership-cues,
+  .recent-object-actions {
+    grid-template-columns: 1fr;
+  }
+  .recent-object-actions { display: flex; flex-wrap: wrap; }
+}
+.recent-object-card.is-journey { border-color: rgba(240,210,138,0.18); }

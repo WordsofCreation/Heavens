@@ -1,4 +1,74 @@
 import { toAbsolutePath } from './path-utils.js';
+import { getJourneyContextLabel, getJourneyHref, getJourneysForObject } from './services/journey-map-service.js';
+import { getComparisonRestoreUrl } from './services/journey-state-service.js';
+
+
+function compactObjectCue(object) {
+  return `<span class="recent-object-cue" style="--cue-color:${objectAccent(object)}" aria-hidden="true"></span>`;
+}
+
+function renderJourneyStepIndicator(config) {
+  if (!config?.stepItems?.length) return '';
+  return `
+    <section class="journey-steps-panel mini-panel" aria-label="Journey progress for ${config.title}">
+      <div class="journey-steps-header">
+        <div>
+          <p class="section-kicker">Journey progress</p>
+          <h2>${config.title}</h2>
+        </div>
+        <p>${config.description || ''}</p>
+      </div>
+      <ol class="journey-step-indicator" role="list">
+        ${config.stepItems.map((step, index) => `<li class="journey-step-pill is-${step.status}"><span class="journey-step-index">${index + 1}</span><span>${step.label}</span></li>`).join('')}
+      </ol>
+      <p class="journey-step-meta">Current step: <strong>${config.currentStep}</strong>${config.nextStep ? ` · Recommended next: <strong>${config.nextStep}</strong>` : ''}</p>
+    </section>
+  `;
+}
+
+function renderJourneyMembershipCues(object, options = {}) {
+  const journeys = getJourneysForObject(object?.id);
+  if (!journeys.length) return '';
+  return `
+    <section class="membership-cues" aria-label="Journey membership for ${object.name}">
+      ${journeys.slice(0, options.limit || 3).map((journey) => `<a class="membership-chip" href="${getJourneyHref(journey)}"><span>${getJourneyContextLabel(journey)}</span><strong>${journey.title}</strong></a>`).join('')}
+    </section>
+  `;
+}
+
+export function renderRecentObjectsPanel({ items = [], title = 'Recent Objects', emptyMessage = 'Your recent object history will appear here.', context = 'default', currentJourneyId = null, currentComparisonIds = [] } = {}) {
+  return `
+    <section class="recent-objects-panel mini-panel" data-recent-context="${context}">
+      <div class="recent-panel-header">
+        <div>
+          <p class="section-kicker">Recent history</p>
+          <h3>${title}</h3>
+        </div>
+        <p>Reopen what you just studied, observed, or compared.</p>
+      </div>
+      ${items.length ? `<div class="recent-object-list">${items.map((item) => `
+        <article class="recent-object-card${item.isJourneyMatch ? ' is-journey' : ''}">
+          <div>
+            <p class="recent-object-topline">${compactObjectCue(item)}<span>${item.type || item.category || 'Object'}</span>${item.isJourneyMatch ? '<span class="tag">Journey match</span>' : ''}</p>
+            <h4>${item.name}</h4>
+            <p>${item.constellation || ''}${item.distance ? ` · ${item.distance}` : ''}</p>
+          </div>
+          <div class="recent-object-actions">
+            <a class="text-link" href="${item.routeHints?.objectPage || objectLink(item)}">Object page</a>
+            <a class="text-link" href="${item.routeHints?.observatory || toAbsolutePath(`pages/observatory.html?object=${item.id}`)}">Observatory</a>
+            <a class="text-link" href="${item.routeHints?.skyViewer || skyLink(item.id)}">Sky Viewer</a>
+            <a class="text-link" href="${getComparisonRestoreUrl([...new Set([...(currentComparisonIds || []), item.id])], { restored: true, from: context })}">Compare</a>
+            ${item.resumeHref ? `<a class="text-link" href="${item.resumeHref}">${item.resumeLabel || 'Resume journey'}</a>` : ''}
+          </div>
+        </article>`).join('')}</div>` : `<p class="text-soft">${emptyMessage}</p>`}
+    </section>
+  `;
+}
+
+function renderComparisonPreview(objects = [], options = {}) {
+  if (!objects.length) return '';
+  return `<section class="comparison-preview mini-panel"><p class="section-kicker">Current comparison set</p><div class="catalog-chip-row">${objects.map((object) => `<span class="tag">${object.name}</span>`).join('')}</div>${options.message ? `<p>${options.message}</p>` : ''}</section>`;
+}
 
 function formatTemperature(value) {
   return value ? `${value.toLocaleString()} K` : '—';
@@ -153,12 +223,14 @@ function readingCard(card) {
   `;
 }
 
-function topicCard(topic) {
+function topicCard(topic, objects = []) {
+  const relatedObjects = (topic.relatedObjectIds || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean).slice(0, 3);
   return `
     <article class="feature-card topic-card">
       <p class="section-kicker">${topic.tag}</p>
       <h3>${topic.title}</h3>
       <p>${topic.description || topic.summary}</p>
+      <div class="catalog-chip-row">${relatedObjects.map((object) => `<a class="tag tag-link" href="${objectLink(object)}">${object.name}</a>`).join('')}</div>
       <a class="text-link" href="${learnTopicLink(topic)}">Explore this topic</a>
     </article>
   `;
@@ -192,6 +264,7 @@ function objectCardTemplate(object, selectedIds) {
         <a class="button button-ghost" href="${objectLink(object)}">Open object page</a>
         <button class="button button-ghost" type="button" data-open-observatory="${object.id}">Open in Observatory Mode</button>
         <button class="button button-ghost" type="button" data-view-sky="${object.id}">View in Sky Viewer</button>
+        <a class="button button-ghost" href="${getComparisonRestoreUrl([...selectedIds, object.id].filter((value, index, array) => array.indexOf(value) === index), { restored: true, from: 'explore-card' })}">Compare this</a>
       </div>
     </article>
   `;
@@ -293,6 +366,7 @@ function compareTableTemplate(objects) {
         <h2>${objects.length} object${objects.length === 1 ? '' : 's'} selected</h2>
       </div>
       <p>Compare category, distance, spectral class, temperature, scale notes, and key science ideas.</p>
+      <div class="stacked-links"><a class="text-link" href="${getComparisonRestoreUrl(objects.map((object) => object.id), { restored: true, from: 'comparison-panel' })}">Open restored comparison view</a><span class="text-soft">Add from object pages, Observatory Mode, or recent history.</span></div>
     </div>
     <div class="comparison-grid">
       ${objects
@@ -353,8 +427,8 @@ export function renderDetail(object, detailContent, progressiveSummary = null) {
   detailContent.innerHTML = detailTemplate(object, progressiveSummary);
 }
 
-export function renderComparison(objects, element) {
-  element.innerHTML = compareTableTemplate(objects);
+export function renderComparison(objects, element, options = {}) {
+  element.innerHTML = `${options.restoredNotice ? `<div class="mini-panel comparison-restore-notice"><strong>${options.restoredNotice}</strong>${options.missingNotice ? `<p>${options.missingNotice}</p>` : ''}<div class="stacked-links"><a class="text-link" href="${options.continueHref || '#'}">Continue comparison</a><a class="text-link" href="${options.clearHref || toAbsolutePath('pages/explore.html')}">Clear comparison</a></div></div>` : ''}${compareTableTemplate(objects)}${renderComparisonPreview(objects, { message: objects.length > 1 ? 'Comparison intent is preserved in the URL and local journey state.' : 'Add one or two more objects to complete the comparison.' })}`;
 }
 
 export function renderFeaturedObject(objects) {
@@ -521,7 +595,9 @@ export function renderObjectPage(pageData, element) {
             <a class="button button-primary" href="${crossLinks?.observatory || toAbsolutePath(`pages/observatory.html?object=${object.id}`)}">Open in Observatory Mode</a>
             <a class="button button-secondary" href="${crossLinks?.skyViewer || skyLink(object.id)}">Explore in the Sky Viewer</a>
             <a class="button button-secondary" href="${toAbsolutePath('pages/explore.html?object=' + object.id)}">Open in Explore</a>
+            <a class="button button-secondary" href="${getComparisonRestoreUrl([...(journeyState?.comparisonSelections || []).map((item) => item.id), object.id].filter((value, index, array) => array.indexOf(value) === index), { restored: true, from: 'object-page' })}">Compare this</a>
           </div>
+          ${renderJourneyMembershipCues(object)}
         </div>
         <aside class="key-fact-panel reveal-on-scroll is-visible">
           <p class="section-kicker">Key facts</p>
@@ -544,6 +620,7 @@ export function renderObjectPage(pageData, element) {
           </section>
 
           ${journeyContinuationCard(journeyState, object)}
+          ${pageData.recentPanel || ''}
           <section class="reading-surface reveal-on-scroll is-visible">
             <p class="section-kicker">What We Learn from Its Light</p>
             <h2>Light turns appearance into evidence</h2>
@@ -576,7 +653,7 @@ export function renderObjectPage(pageData, element) {
             </div>
             <div class="card-grid three-up compact-grid">
               ${[...furtherReading, ...researchInspiration].map(readingCard).join('')}
-              ${relatedTopics.map(topicCard).join('')}
+              ${relatedTopics.map((topic) => topicCard(topic, [object, ...relatedObjects])).join('')}
             </div>
           </section>
         </div>
@@ -624,13 +701,14 @@ export function renderObjectPage(pageData, element) {
   `;
 }
 
-export function renderDiscoverPage({ modules, topics, objects }, element) {
+export function renderDiscoverPage({ modules, topics, objects, journeyStep, recentPanel, continueModule }, element) {
   element.innerHTML = `
     <section class="container page-intro reveal-on-scroll is-visible">
       <p class="eyebrow">Discover</p>
       <h1>A science-driven hub for curiosity, questions, and research pathways.</h1>
       <p>Discover brings together featured objects, cosmic questions, spectral science, deep-sky highlights, and research-oriented prompts that can later connect to live public archives without changing the presentation layer.</p>
     </section>
+    <section class="container reveal-on-scroll is-visible">${renderJourneyStepIndicator(journeyStep)}${continueModule || ''}</section>
     <section class="container card-grid three-up compact-grid">
       ${modules.map((module) => {
         const linkedObjects = (module.objectIds || []).map((id) => objects.find((object) => object.id === id)).filter(Boolean);
@@ -657,19 +735,21 @@ export function renderDiscoverPage({ modules, topics, objects }, element) {
         </div>
       </div>
       <div class="card-grid three-up compact-grid">
-        ${topics.map(topicCard).join('')}
+        ${topics.map((topic) => topicCard(topic, objects)).join('')}
       </div>
     </section>
+    <section class="container reveal-on-scroll is-visible">${recentPanel || ''}</section>
   `;
 }
 
-export function renderLearnPage({ paths, topics, startHere, objects }, element) {
+export function renderLearnPage({ paths, topics, startHere, objects, journeyStep, recentPanel, continueModule }, element) {
   element.innerHTML = `
     <section class="container page-intro reveal-on-scroll is-visible">
       <p class="eyebrow">Learn</p>
       <h1>Guided astronomy pathways for building understanding step by step.</h1>
       <p>Learn is a self-guided science experience that connects approachable explanations with real objects from the catalog, helping the site feel like a connected astronomy curriculum rather than a collection of isolated pages.</p>
     </section>
+    <section class="container reveal-on-scroll is-visible">${renderJourneyStepIndicator(journeyStep)}${continueModule || ''}</section>
     <section class="container highlight-banner reveal-on-scroll is-visible">
       <div>
         <p class="section-kicker">${startHere.title}</p>
@@ -700,6 +780,7 @@ export function renderLearnPage({ paths, topics, startHere, objects }, element) 
               <div>
                 <h3>Related topics</h3>
                 <div class="catalog-chip-row">${pathTopics.map(topicChip).join('')}</div>
+                <p class="text-soft">Recommended next: compare the linked objects, then open Observatory Mode to observe the pattern in context.</p>
               </div>
               <div>
                 <h3>Example objects</h3>
@@ -710,6 +791,7 @@ export function renderLearnPage({ paths, topics, startHere, objects }, element) 
         `;
       }).join('')}
     </section>
+    <section class="container reveal-on-scroll is-visible">${recentPanel || ''}</section>
   `;
 }
 
@@ -780,6 +862,7 @@ export function renderObservatoryPage({ skyNodes, journeys, regions, storyPanels
             </div>
             <div id="observatory-object-panel"></div>
           </article>
+          <div id="observatory-recent-panel"></div>
           <article class="mini-panel observatory-panel-block" id="observatory-journeys">
             <p class="section-kicker">Guided Discovery</p>
             <h2>Choose a journey</h2>

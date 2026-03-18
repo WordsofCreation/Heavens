@@ -508,3 +508,98 @@ This gives the site one lightweight object payload that can be shared across imm
 4. Link related learn/discover content where appropriate.
 5. The journey can then persist through `setActiveJourney()` and be resumed from linked pages or the homepage resume card.
 
+
+## Journey-aware science linking and recent-history expansion
+
+Heavens now includes a richer continuity layer that connects Learn, Discover, object pages, Explore, and Observatory Mode through shared journey metadata, reusable recent-history UI, and comparison restoration.
+
+### Journey step indicators
+
+Journey step indicators are modeled as reusable, static-friendly journey definitions in `js/services/journey-map-service.js`.
+
+Each journey record can define:
+
+- `id`: stable key for linking and persistence
+- `title`, `kind`, `theme`, and `description`: editorial framing
+- `pageHref`: where the journey is resumed from Learn or Discover
+- `steps`: an ordered sequence such as `Start`, `Explore`, `Understand`, `Compare`, `Observe`, and `Continue`
+- `topicIds`: science topics associated with the journey
+- `objectIds`: curated catalog objects associated with the journey
+- `recommendedTopicIds` and `recommendedObjectIds`: recommended next links for future UI expansion
+
+`getStepState()` turns that configuration into presentational data for the reusable step-indicator UI. Learn and Discover use the same rendering model while still allowing different step orders for learning-oriented and discovery-oriented journeys.
+
+### Recent-history model and reusable panel
+
+Recent history is now managed centrally in `js/services/journey-state-service.js`.
+
+The state model stores:
+
+- `recentObjects`: recently viewed or focused objects
+- `comparisonSelections`: the active comparison set
+- `comparisonDraft`: a restorable comparison intent payload
+- `recentComparisons`: compact history for recently restored or assembled comparison sets
+- `activeJourney` and `learningPath`: the user's most recent structured context
+
+The reusable renderer in `renderRecentObjectsPanel()` powers compact recent-object panels across:
+
+- Explore
+- Learn
+- Discover
+- object pages
+- Observatory Mode side content
+
+The panel reuses existing route hints so it does not duplicate homepage logic. It also supports context labels, count limits, compare actions, and journey-aware resume links. If storage is unavailable, the same APIs fall back to in-memory state so the site still works during the current session.
+
+### Comparison restoration
+
+Comparison restoration uses a lightweight hybrid strategy:
+
+1. the active comparison set is written into local state via `rememberComparison()`
+2. restoration-ready links are generated with `getComparisonRestoreUrl()`
+3. Explore reads URL state with `deriveComparisonStateFromUrl()` and restores any valid object ids it finds
+4. invalid or missing ids are ignored gracefully, with a UI notice when restoration is partial
+
+This keeps comparison intent portable across object pages, recent-history panels, Explore cards, and Observatory Mode while remaining GitHub Pages compatible and backend-free.
+
+### Journey-aware science linking
+
+Journey-aware linking is driven by a small curated graph rather than random recommendation logic.
+
+Relationships are defined through:
+
+- catalog object topic ids in `js/services/object-service.js`
+- topic-to-object relationships in `data/science-content.json`
+- journey-to-object and journey-to-topic relationships in `js/services/journey-map-service.js`
+
+That allows the interface to:
+
+- show journey membership cues on object pages
+- surface related science topics in Observatory Mode and object views
+- add topic-linked objects to Discover topic cards
+- keep Learn pathways tied to concrete objects that can be reopened immediately
+- highlight when recent objects belong to the current learning or discovery flow
+
+### Adding objects, pages, or topics to one or more journeys
+
+To attach content to a journey:
+
+1. Update or add a journey entry in `js/services/journey-map-service.js`.
+2. Add the relevant object ids to `objectIds`.
+3. Add the relevant topic ids to `topicIds`.
+4. Point `pageHref` at the Learn or Discover entry point that should resume the journey.
+5. If needed, extend `relatedObjectIds`, `exampleObjectIds`, or topic mappings in `data/science-content.json`.
+6. Ensure the underlying object has matching topic relationships in `js/services/object-service.js` if the journey should also surface on object pages.
+
+Because the model is local and declarative, the site stays static-first while remaining easy to extend.
+
+### Resume and restore behavior
+
+Resume behavior follows a simple priority order:
+
+- if a learning path is active, Learn offers a “Continue where you left off” module
+- if a discovery journey is active, Discover offers a matching resume module back into Observatory Mode
+- recent-object panels highlight journey matches and offer resume actions
+- comparison links preserve compare intent in the URL so the Explore comparison panel can reopen reliably
+
+This continuity layer is intentionally modest and resilient: if persistence fails, the page still renders its editorial content and all primary navigation remains usable.
