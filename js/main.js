@@ -20,6 +20,16 @@ import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './servi
 import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
 import { getDiscoverModules, getLearningPaths, getScienceTopics, getStartHereGuide } from './services/science-content-service.js';
 import { getObservatoryData } from './services/observatory-service.js';
+import {
+  buildCrossLinks,
+  getJourneyResume,
+  getStorageAvailability,
+  loadJourneyState,
+  rememberComparison,
+  rememberObject,
+  setActiveJourney,
+  setLearningPath
+} from './services/journey-state-service.js';
 import { toAbsolutePath } from './path-utils.js';
 
 setupNavigation();
@@ -27,6 +37,30 @@ setupRevealAnimations();
 buildConstellationViewer();
 
 const page = document.body.dataset.page;
+
+function navigateTo(link) {
+  window.location.href = link;
+}
+
+function injectHomeJourneyResume() {
+  if (page !== 'home') return;
+  const state = getJourneyResume();
+  const grid = document.querySelector('.featured-home-grid');
+  if (!grid || !state?.lastObject) return;
+  const article = document.createElement('article');
+  article.className = 'feature-card reveal-on-scroll is-visible';
+  article.innerHTML = `
+    <p class="section-kicker">Resume your journey</p>
+    <h2>Pick up where you left off with ${state.lastObject.name}.</h2>
+    <p>${state.activeJourney ? `Continue the ${state.activeJourney.title} route, or reopen ${state.lastObject.name} in the view that best fits your next step.` : 'Your most recent object is ready to reopen across Explore, Observatory Mode, and the Sky Viewer.'}</p>
+    <div class="stacked-links">
+      <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).observatory}">Resume in Observatory Mode</a>
+      <a class="text-link" href="${buildCrossLinks(state.lastObject, { journeyId: state.activeJourney?.id, from: 'home-resume' }).skyViewer}">Open in Sky Viewer</a>
+      <a class="text-link" href="${state.lastObject.routeHints?.objectPage || buildCrossLinks(state.lastObject).objectPage}">Open object page</a>
+    </div>
+  `;
+  grid.prepend(article);
+}
 
 async function initExplore(objects) {
   const searchInput = document.getElementById('search-input');
@@ -45,7 +79,7 @@ async function initExplore(objects) {
   let activeQuery = params.get('q') || '';
   let activeSort = params.get('sort') || 'name';
   let activeObjectId = params.get('object') || '';
-  const compareIds = new Set();
+  const compareIds = new Set((loadJourneyState().comparisonSelections || []).map((item) => item.id));
 
   searchInput.value = activeQuery;
   sortSelect.value = activeSort;
@@ -62,10 +96,19 @@ async function initExplore(objects) {
   };
 
   const openSkyViewer = (id) => {
-    window.location.href = toAbsolutePath(`pages/sky-viewer.html?object=${id}`);
+    const object = objects.find((item) => item.id === id);
+    if (object) rememberObject(object, { mode: 'Explore', source: 'Explore' });
+    navigateTo(buildCrossLinks(object || { id }, { from: 'explore' }).skyViewer);
+  };
+
+  const openObservatory = (id) => {
+    const object = objects.find((item) => item.id === id);
+    if (object) rememberObject(object, { mode: 'Explore', source: 'Explore' });
+    navigateTo(buildCrossLinks(object || { id }, { from: 'explore' }).observatory);
   };
 
   const openObject = async (object) => {
+    rememberObject(object, { mode: 'Explore', source: 'Explore' });
     const progressiveSummary = await getProgressiveObjectSummary(object);
     renderDetail({ ...object }, detailContent, progressiveSummary);
     activeObjectId = object.id;
@@ -82,18 +125,22 @@ async function initExplore(objects) {
         count: resultsCount,
         onSelect: openObject,
         onViewSky: openSkyViewer,
+        onOpenObservatory: openObservatory,
         onToggleCompare: (id) => {
           if (compareIds.has(id)) {
             compareIds.delete(id);
           } else if (compareIds.size < 3) {
             compareIds.add(id);
           }
+          rememberComparison(objects.filter((object) => compareIds.has(object.id)));
           applyFilters();
         }
       },
       compareIds
     );
-    renderComparison(objects.filter((object) => compareIds.has(object.id)), comparePanel);
+    const comparedObjects = objects.filter((object) => compareIds.has(object.id));
+    rememberComparison(comparedObjects);
+    renderComparison(comparedObjects, comparePanel);
     renderContextualInsight(filtered.length ? filtered : objects, contextPanel, activeCategory);
     syncUrl();
   };
@@ -170,6 +217,7 @@ async function initSkyViewer(objects) {
   const integrationStatus = getFutureIntegrationStatus();
 
   const selectObject = async (object) => {
+    rememberObject(object, { mode: 'Sky Viewer', source: new URLSearchParams(window.location.search).get('from') || 'Sky Viewer' });
     emptyState.hidden = true;
     guidance.hidden = true;
     viewerStatus.textContent = `Centering on ${object.name}…`;
@@ -179,7 +227,8 @@ async function initSkyViewer(objects) {
       object,
       relatedObjects: findRelatedObjects(object, objects),
       integrationStatus,
-      progressiveSummary
+      progressiveSummary,
+      journeyState: loadJourneyState()
     }, panel);
 
     if (api) {
@@ -254,9 +303,9 @@ async function initObservatory() {
 
   const ctx = canvas.getContext('2d');
   const { skyNodes, journeys, regions, storyPanels } = observatoryData;
-  let activeJourney = journeys.find((journey) => journey.id === params.get('journey')) || journeys[0];
-  let activeFilter = 'all';
-  let activeObject = skyNodes.find((object) => object.id === params.get('object')) || activeJourney.objects[0] || skyNodes[0];
+  let activeJourney = journeys.find((journey) => journey.id === params.get('journey')) || journeys.find((journey) => journey.id === loadJourneyState().activeJourney?.id) || journeys[0];
+  let activeFilter = params.get('filter') || 'all';
+  let activeObject = skyNodes.find((object) => object.id === params.get('object')) || skyNodes.find((object) => object.id === loadJourneyState().lastObject?.id) || activeJourney.objects[0] || skyNodes[0];
   let animationFrame = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const camera = { x: activeObject.x, y: activeObject.y, scale: 1.08 };
@@ -310,6 +359,8 @@ async function initObservatory() {
     const region = regions.find((item) => item.objectIds.includes(object.id));
     const relatedTopics = (object.relatedTopicCards || []).slice(0, 3).map((topic) => `<a class="tag tag-link" href="${toAbsolutePath(topic.pageHref)}">${topic.title}</a>`).join('');
     const fame = object.apparentMagnitude <= 1 ? 'Headline sky object' : object.distanceLightYears > 100000 ? 'Cosmic scale landmark' : 'Guided observatory target';
+    const journeyState = loadJourneyState();
+    const links = buildCrossLinks(object, { journeyId: activeJourney?.id, from: 'observatory', regionId: region?.id || undefined, compareTo: 'sun' });
     objectPanel.innerHTML = `
       <div class="observatory-object-card">
         <div class="observatory-object-topline">
@@ -339,9 +390,11 @@ async function initObservatory() {
         </div>
         <div class="distance-meter"><div class="distance-meter-bar"><span style="width:${distanceFill(object.distanceLightYears)}"></span></div><small>Distance scale in the observatory collection</small></div>
         <section class="mini-panel nested-panel"><h3>What its light reveals</h3><p>${object.lightStory}</p></section>
+        <section class="mini-panel nested-panel"><h3>Journey continuity</h3><p>${journeyState.activeJourney ? `You are in the ${journeyState.activeJourney.title} path.` : 'Open a guided route to connect this target to a bigger sky story.'}</p><div class="stacked-links">${journeyState.activeJourney ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/learn.html#path-${journeyState.activeJourney.id}`)}\">Continue the learning thread</a>` : ''}<a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${links.objectPage}">Open full object page</a></div></section>
+        <section class="mini-panel nested-panel"><h3>Discovery actions</h3><div class="stacked-links"><a class="text-link" href="${links.skyViewer}">Open in Sky Viewer</a><a class="text-link" href="${links.explore}">Compare with another object</a><a class="text-link" href="${toAbsolutePath(`pages/discover.html`)}">Explore related science</a>${object.relatedObjectIds?.[0] ? `<a class=\"text-link\" href=\"${toAbsolutePath(`pages/observatory.html?object=${object.relatedObjectIds[0]}&journey=${activeJourney?.id || ''}&from=related`)}\">Explore related objects</a>` : ''}<a class="text-link" href="${toAbsolutePath(`pages/objects/sun.html?compare=${object.id}`)}">Compare to the Sun</a></div></section>
         <section class="mini-panel nested-panel"><h3>Related science topics</h3><div class="catalog-chip-row">${relatedTopics}</div></section>
       </div>`;
-    objectLink.href = toAbsolutePath(`pages/objects/${object.id}.html`);
+    objectLink.href = links.objectPage;
     statusTitle.textContent = object.name;
     statusCopy.textContent = `${object.skyGuide} ${region ? region.note : ''}`;
   };
@@ -375,6 +428,8 @@ async function initObservatory() {
     renderHotspots();
     renderObjectPanel(object);
     renderJourneyPanel();
+    rememberObject(object, { mode: 'Observatory Mode', source: params.get('from') || 'Observatory Mode', skyRegion: object.regionId || null });
+    setActiveJourney(activeJourney, { currentObjectId: object.id, originMode: 'Observatory Mode' });
     syncUrl();
   };
 
@@ -446,11 +501,14 @@ async function initObservatory() {
   renderHotspots();
   renderObjectPanel(activeObject);
   renderJourneyPanel();
+  rememberObject(activeObject, { mode: 'Observatory Mode', source: params.get('from') || 'Observatory Mode', skyRegion: activeObject.regionId || null });
+  setActiveJourney(activeJourney, { currentObjectId: activeObject.id, originMode: 'Observatory Mode' });
 
   document.querySelectorAll('[data-journey-id]').forEach((button) => button.addEventListener('click', () => {
     const journey = journeys.find((item) => item.id === button.dataset.journeyId);
     if (!journey) return;
     activeJourney = journey;
+    setActiveJourney(journey, { currentObjectId: journey.objects?.[0]?.id || null, originMode: 'Observatory Mode' });
     activeFilter = 'favorites';
     renderFilters();
     renderJourneyPanel();
@@ -478,7 +536,8 @@ async function initObjectPage() {
     return;
   }
 
-  renderObjectPage(pageData, target);
+  rememberObject(pageData.object, { mode: 'Object Page', source: new URLSearchParams(window.location.search).get('from') || 'Object Page' });
+  renderObjectPage({ ...pageData, journeyState: loadJourneyState(), crossLinks: buildCrossLinks(pageData.object, { journeyId: loadJourneyState().activeJourney?.id, from: 'object-page' }) }, target);
 }
 
 async function initDiscoverPage(objects) {
@@ -495,12 +554,18 @@ async function initLearnPage(objects) {
 
   const [paths, topics, startHere] = await Promise.all([getLearningPaths(), getScienceTopics(), getStartHereGuide()]);
   renderLearnPage({ paths, topics, startHere, objects }, target);
+  const hash = window.location.hash.replace('#path-', '');
+  const activePath = paths.find((path) => path.id === hash) || paths[0];
+  if (activePath) setLearningPath(activePath);
 }
+
 
 async function init() {
   const objects = await getAstronomyObjects();
   renderFeaturedObject(objects);
   renderHomepageExperience(objects);
+  injectHomeJourneyResume();
+  document.body.dataset.storageAvailable = String(getStorageAvailability());
 
   if (page === 'explore') await initExplore(objects);
   if (page === 'sky-viewer') await initSkyViewer(objects);

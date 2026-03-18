@@ -126,6 +126,7 @@ function enrichObject(object, topics) {
 
   return {
     ...object,
+    altNames: object.altNames || object.alternateNames || [],
     raDegrees,
     decDegrees,
     coordinatesLabel: `${object.ra}, ${object.dec}`,

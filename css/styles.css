@@ -617,3 +617,68 @@ select, input, button { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   body::before, .button, .catalog-card, .observatory-hotspot-dot { animation: none !important; transition: none !important; }
 }
+
+.mini-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+.mini-breadcrumb a { color: var(--text-soft); text-decoration: none; }
+.mini-breadcrumb a:hover, .mini-breadcrumb a:focus-visible { color: var(--gold); }
+
+.stellar-class-card {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(135,171,255,0.16);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+}
+.stellar-class-card.is-compact { margin-top: 0; }
+.stellar-class-header, .stellar-class-metrics {
+  display: grid;
+  gap: 0.85rem;
+}
+.stellar-class-header { grid-template-columns: 1fr auto; align-items: center; }
+.spectral-scale { position: relative; padding-top: 1.2rem; }
+.spectral-scale-bar {
+  height: 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7ea0ff 0%, #9ebcfb 16%, #dfe8ff 34%, #f7f6e8 50%, #f2cd83 70%, #ffad6b 84%, #ff8f7a 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+}
+.spectral-scale-labels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  margin-top: 0.35rem;
+}
+.spectral-scale-marker {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text);
+  font-size: 0.72rem;
+}
+.spectral-scale-marker::after {
+  content: '';
+  width: 2px;
+  height: 1.1rem;
+  background: rgba(255,255,255,0.85);
+  border-radius: 999px;
+}
+.spectral-scale-marker.is-unplaced::after { background: rgba(240,210,138,0.85); }
+.stellar-class-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stellar-class-note { color: var(--text-soft); margin: 0; }
+.continuity-card { margin-bottom: 1rem; }
+
+@media (max-width: 720px) {
+  .stellar-class-header, .stellar-class-metrics { grid-template-columns: 1fr; }
+}

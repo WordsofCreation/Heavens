@@ -371,3 +371,140 @@ Because navigation uses relative links, generated static pages, local JSON, and 
 - **Progressive enhancement**: external summaries and future research integrations can improve the experience without becoming a hard dependency
 - **Accessible interactions**: includes keyboard-friendly controls, dialog focus management, reduced-motion handling, and strong reading hierarchy
 - **Premium visual integration**: uses one cohesive cosmic design language across homepage, explorer, observatory, object pages, and science storytelling
+
+## What's new in the Cross-Experience Integration release
+
+- **Unified object context handoff** across Explore, object pages, Observatory Mode, and Sky Viewer using static-friendly query parameters plus a shared local state helper in `js/services/journey-state-service.js`
+- **Observatory Mode entry points** from Explore cards, detail panels, related-object modules, and dedicated object pages so object focus can carry through with intent-preserving links
+- **Observatory → Sky Viewer handoff** that opens the real-sky map with the same target object and source context already selected when possible
+- **Persistent journey continuity** for the last object, recent objects, selected comparisons, current observatory journey, last-used mode, and active learning path, with graceful fallback when storage is unavailable
+- **Compact stellar-class comparison visualization** reused across object pages, comparison views, Sky Viewer panels, and quick detail overlays
+- **Homepage resume card** that helps visitors continue a prior discovery session without requiring a backend or SPA router
+
+## How Observatory Mode links to Sky Viewer
+
+Observatory Mode now acts as the immersive discovery layer, while Sky Viewer acts as the explicit real-sky context layer.
+
+- Focus an object in Observatory Mode.
+- Use the focus panel's **Open in Sky Viewer** action.
+- The site passes the selected object through the URL, preserving journey/source context such as `object`, `journey`, `from`, and optional region hints.
+- Sky Viewer reads that context on load, restores the same target object, centers the viewer when Aladin Lite is available, and still shows the local science panel if the live map cannot load.
+
+This keeps the transition understandable, accessible, and compatible with GitHub Pages because it relies on stable static URLs rather than server-side routing.
+
+## How object-context handoff works
+
+Cross-page object handoff uses two cooperating layers:
+
+1. **URL-level deep links**
+   - Built by `buildCrossLinks()` in `js/services/journey-state-service.js`
+   - Produces GitHub Pages friendly links for Explore, Observatory Mode, Sky Viewer, and object pages
+   - Encodes lightweight context through query parameters such as:
+     - `object`: stable object id
+     - `journey`: active guided observatory journey
+     - `from`: source surface such as Explore, Observatory Mode, object page, or resume card
+     - `region`: optional observatory sky-region context
+
+2. **Unified persisted object context**
+   - Stored through `rememberObject()` in `js/services/journey-state-service.js`
+   - Preserves a normalized object record containing identity, display name, alt names, category, constellation, spectral data, temperature, distance, coordinate labels, related objects, science links, and route hints
+
+If persistence is unavailable, the URL still carries enough information for a clean handoff.
+
+## How journey persistence works
+
+Journey continuity is intentionally lightweight and privacy-respectful.
+
+### Storage approach
+
+- Primary persistence: `localStorage`
+- Graceful fallback: in-memory state for the current page session only
+- No backend, account system, or tracking dependency required
+
+### Stored fields
+
+The shared state model currently preserves:
+
+- `lastObject`
+- `recentObjects`
+- `comparisonSelections`
+- `activeJourney`
+- `learningPath`
+- `lastMode`
+- `skyRegion`
+- `lastSource`
+- `updatedAt`
+
+### Behavioral goals
+
+- Users can move from Explore to Observatory Mode to Sky Viewer without losing the selected object
+- Guided journeys can survive navigation away from Observatory Mode
+- Learning-path context can follow object-page visits and resume from the Learn page
+- The homepage can render a **Resume your journey** card when meaningful state exists
+- If storage is blocked, pages still load correctly and simply fall back to URL-driven navigation
+
+## How the stellar-class comparison visualization is structured
+
+The compact comparison component is rendered by `spectralClassComparison()` in `js/star-renderer.js`.
+
+It is designed to be educational without becoming a dense scientific chart.
+
+### Included cues
+
+- a broad **O–M spectral sequence bar**
+- a **marker** showing where the focused object sits when a stellar class exists
+- **temperature context**
+- a **color cue** tied to the site's object accent palette
+- a short **scale / lifecycle hint** based on the object's size notes
+- a **Sun comparison label** so users have a familiar reference
+
+### Where it appears
+
+- Explore detail panels
+- comparison cards
+- Sky Viewer focus panels
+- dedicated object pages
+
+## Unified object state model
+
+The unified object context model is assembled from catalog data enriched in `js/services/object-service.js` and normalized in `js/services/journey-state-service.js`.
+
+The normalized context includes:
+
+- `id`
+- `name`
+- `altNames`
+- `category`
+- `type`
+- `constellation`
+- `spectralClass`
+- `color`
+- `temperatureK`
+- `distance`
+- `distanceLightYears`
+- `coordinates`
+- `relatedObjectIds`
+- `scienceTopicIds`
+- `learningLinks`
+- `routeHints`
+
+This gives the site one lightweight object payload that can be shared across immersive, informational, comparative, and educational surfaces without introducing a heavy centralized framework.
+
+## How to add new cross-linked objects and journey-aware content
+
+### Add a new cross-linked object
+
+1. Add the object's source data to `data/objects.json`.
+2. Ensure it has a stable `id`, `name`, sky coordinates, category, type, distance, summary, and science notes.
+3. If it should appear in Observatory Mode, add a layout position in `buildSkyNodes()` inside `js/services/observatory-service.js`.
+4. Add or regenerate the object's static page in `pages/objects/`.
+5. The shared object enrichment in `js/services/object-service.js` and route generation in `js/services/journey-state-service.js` will automatically make it available to cross-experience handoffs.
+
+### Add a new guided or journey-aware route
+
+1. Add a new journey to `JOURNEYS` in `js/services/observatory-service.js`.
+2. Reference valid object ids in `objectIds`.
+3. Write short explanatory `steps` and a concise `description`.
+4. Link related learn/discover content where appropriate.
+5. The journey can then persist through `setActiveJourney()` and be resumed from linked pages or the homepage resume card.
+

@@ -56,6 +56,73 @@ function topicChip(topic) {
   return `<a class="tag tag-link" href="${learnTopicLink(topic)}">${topic.title}</a>`;
 }
 
+function objectAccent(object) {
+  if (object.color?.includes('red')) return '#ff8d7a';
+  if (object.color?.includes('orange') || object.color?.includes('gold') || object.color?.includes('yellow')) return '#f0c97b';
+  if (object.color?.includes('blue')) return '#87abff';
+  return '#edf2ff';
+}
+
+function spectralClassComparison(object, options = {}) {
+  const spectral = object.spectralClass && object.spectralClass !== 'Not applicable' ? object.spectralClass : 'No stellar spectrum';
+  const family = object.spectralClass?.[0]?.toUpperCase();
+  const families = ['O', 'B', 'A', 'F', 'G', 'K', 'M'];
+  const markerIndex = families.indexOf(family);
+  const marker = markerIndex >= 0 ? (markerIndex / (families.length - 1)) * 100 : null;
+  const sunLabel = object.id === 'sun' ? 'Solar reference' : 'Compared with the Sun';
+  return `
+    <section class="stellar-class-card mini-panel${options.compact ? ' is-compact' : ''}" aria-label="Stellar class comparison for ${object.name}">
+      <div class="stellar-class-header">
+        <div>
+          <p class="section-kicker">Stellar class in context</p>
+          <h3>${spectral}</h3>
+        </div>
+        <span class="tag">${sunLabel}</span>
+      </div>
+      <div class="spectral-scale" role="img" aria-label="Spectral scale from hot blue O class stars to cooler red M class stars">
+        <div class="spectral-scale-bar"></div>
+        <div class="spectral-scale-labels"><span>O</span><span>B</span><span>A</span><span>F</span><span>G</span><span>K</span><span>M</span></div>
+        ${marker !== null ? `<span class="spectral-scale-marker" style="left:${marker}%"><strong>${object.name}</strong></span>` : '<span class="spectral-scale-marker is-unplaced" style="left:50%"><strong>Gas / galaxy object</strong></span>'}
+      </div>
+      <div class="stellar-class-metrics">
+        <div>
+          <strong>Temperature</strong>
+          <p>${formatTemperature(object.temperatureK)}</p>
+        </div>
+        <div>
+          <strong>Color cue</strong>
+          <p><span class="temp-swatch" style="--object-color:${objectAccent(object)}"></span>${object.color || 'Mixed light'}</p>
+        </div>
+        <div>
+          <strong>Scale hint</strong>
+          <p>${object.sizeNotes || 'Use the object page to compare scale and lifecycle context.'}</p>
+        </div>
+      </div>
+      <p class="stellar-class-note">This compact bar is meant to orient, not overwhelm: it places ${object.name} against the familiar Sun and the broad hot-to-cool stellar sequence.</p>
+    </section>
+  `;
+}
+
+function miniBreadcrumb(items = []) {
+  if (!items.length) return '';
+  return `<nav class="mini-breadcrumb" aria-label="Journey context">${items.map((item, index) => item.href ? `<a href="${item.href}">${item.label}</a>` : `<span>${item.label}</span>`).join('<span aria-hidden="true">/</span>')}</nav>`;
+}
+
+function journeyContinuationCard(state, object) {
+  if (!state?.activeJourney && !state?.learningPath) return '';
+  return `
+    <section class="mini-panel continuity-card">
+      <p class="section-kicker">Continue your journey</p>
+      <h3>${state.activeJourney?.title || state.learningPath?.title}</h3>
+      <p>${state.activeJourney ? `You arrived with the ${state.activeJourney.title} route active.` : `You recently opened the ${state.learningPath.title} learning path.`}</p>
+      <div class="stacked-links">
+        ${state.activeJourney ? `<a class="text-link" href="${toAbsolutePath(`pages/observatory.html?journey=${state.activeJourney.id}&object=${object.id}`)}">Resume in Observatory Mode</a>` : ''}
+        ${state.learningPath ? `<a class="text-link" href="${toAbsolutePath(`pages/learn.html#path-${state.learningPath.id}`)}">Resume learning path</a>` : ''}
+      </div>
+    </section>
+  `;
+}
+
 function relatedObjectCard(object, eyebrow = 'Related object') {
   return `
     <article class="feature-card related-card">
@@ -123,6 +190,7 @@ function objectCardTemplate(object, selectedIds) {
       <div class="catalog-chip-row">${(object.relatedTopicCards || []).slice(0, 3).map(topicChip).join('')}</div>
       <div class="catalog-card-actions">
         <a class="button button-ghost" href="${objectLink(object)}">Open object page</a>
+        <button class="button button-ghost" type="button" data-open-observatory="${object.id}">Open in Observatory Mode</button>
         <button class="button button-ghost" type="button" data-view-sky="${object.id}">View in Sky Viewer</button>
       </div>
     </article>
@@ -152,8 +220,10 @@ function detailTemplate(object, progressiveSummary) {
       </div>
       <div class="detail-actions">
         <a class="button button-primary" href="${objectLink(object)}">Open full object page</a>
+        <a class="button button-secondary" href="${toAbsolutePath(`pages/observatory.html?object=${object.id}&from=explore`)}">Open in Observatory Mode</a>
         <a class="button button-secondary" href="${skyLink(object.id)}">View in Sky Viewer</a>
       </div>
+      ${spectralClassComparison(object, { compact: true })}
       <div class="detail-list">
         <div><strong>Type</strong><p>${object.type}</p></div>
         <div><strong>Constellation</strong><p>${object.constellation}</p></div>
@@ -230,6 +300,7 @@ function compareTableTemplate(objects) {
           (object) => `
             <article class="comparison-card">
               <h3>${object.name}</h3>
+              ${spectralClassComparison(object, { compact: true })}
               <p class="catalog-type-line">${temperatureSwatch(object)}<span>${object.type}</span></p>
               ${spectralBadge(object.spectralClass)}
               <dl class="comparison-list">
@@ -248,13 +319,13 @@ function compareTableTemplate(objects) {
 }
 
 export function renderCatalog(objects, elements, selectedIds) {
-  const { grid, count, onSelect, onToggleCompare, onViewSky } = elements;
+  const { grid, count, onSelect, onToggleCompare, onViewSky, onOpenObservatory } = elements;
   grid.innerHTML = objects.map((object) => objectCardTemplate(object, selectedIds)).join('');
   count.textContent = `${objects.length} object${objects.length === 1 ? '' : 's'} in view`;
 
   grid.querySelectorAll('.catalog-card').forEach((card) => {
     const handler = (event) => {
-      if (event?.target?.closest('.compare-toggle, [data-view-sky], a')) return;
+      if (event?.target?.closest('.compare-toggle, [data-view-sky], [data-open-observatory], a')) return;
       const object = objects.find((item) => item.id === card.dataset.objectId);
       onSelect(object);
     };
@@ -272,6 +343,9 @@ export function renderCatalog(objects, elements, selectedIds) {
   });
   grid.querySelectorAll('[data-view-sky]').forEach((button) => {
     button.addEventListener('click', () => onViewSky(button.dataset.viewSky));
+  });
+  grid.querySelectorAll('[data-open-observatory]').forEach((button) => {
+    button.addEventListener('click', () => onOpenObservatory?.(button.dataset.openObservatory));
   });
 }
 
@@ -385,12 +459,14 @@ export function renderFeaturedRegions(regions, element) {
   `).join('');
 }
 
-export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus, progressiveSummary }, panel) {
+export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus, progressiveSummary, journeyState }, panel) {
   panel.innerHTML = `
     <article class="detail-article">
       <p class="eyebrow">Sky Viewer focus</p>
       <h2>${object.name}</h2>
+      ${miniBreadcrumb([{ label: 'Sky Viewer', href: toAbsolutePath('pages/sky-viewer.html') }, journeyState?.lastSource ? { label: `From ${journeyState.lastSource}` } : null].filter(Boolean))}
       <p>${object.skyGuide}</p>
+      ${spectralClassComparison(object, { compact: true })}
       <div class="detail-list">
         ${object.keyFacts.map((fact) => `<div><strong>${fact.label}</strong><p>${fact.value}</p></div>`).join('')}
       </div>
@@ -398,6 +474,7 @@ export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus
         <h3>What we learn from its light</h3>
         <p>${object.whatWeLearnFromItsLight}</p>
       </section>
+      ${journeyContinuationCard(journeyState, object)}
       <section class="mini-panel">
         <h3>Explore next</h3>
         <div class="card-grid three-up compact-grid">
@@ -420,13 +497,18 @@ export function renderSkyViewerPanel({ object, relatedObjects, integrationStatus
 }
 
 export function renderObjectPage(pageData, element) {
-  const { object, relatedObjects, relatedTopics, furtherReading, researchInspiration, observeNext, featuredQuestion } = pageData;
+  const { object, relatedObjects, relatedTopics, furtherReading, researchInspiration, observeNext, featuredQuestion, journeyState, crossLinks } = pageData;
   document.title = `${object.name} | Heavens`;
 
   element.innerHTML = `
     <section class="object-hero hero object-page-hero">
       <div class="container object-hero-grid">
         <div class="reveal-on-scroll is-visible">
+          ${miniBreadcrumb([
+            { label: 'Explore', href: crossLinks?.explore || toAbsolutePath('pages/explore.html') },
+            journeyState?.activeJourney ? { label: journeyState.activeJourney.title, href: toAbsolutePath(`pages/observatory.html?journey=${journeyState.activeJourney.id}&object=${object.id}`) } : null,
+            { label: object.name }
+          ].filter(Boolean))}
           <p class="eyebrow">Dedicated object page</p>
           <h1>${object.name}</h1>
           <p class="hero-text">${object.introDescription}</p>
@@ -436,7 +518,8 @@ export function renderObjectPage(pageData, element) {
             <span>${object.distance}</span>
           </div>
           <div class="hero-actions">
-            <a class="button button-primary" href="${skyLink(object.id)}">Explore in the Sky Viewer</a>
+            <a class="button button-primary" href="${crossLinks?.observatory || toAbsolutePath(`pages/observatory.html?object=${object.id}`)}">Open in Observatory Mode</a>
+            <a class="button button-secondary" href="${crossLinks?.skyViewer || skyLink(object.id)}">Explore in the Sky Viewer</a>
             <a class="button button-secondary" href="${toAbsolutePath('pages/explore.html?object=' + object.id)}">Open in Explore</a>
           </div>
         </div>
@@ -460,6 +543,7 @@ export function renderObjectPage(pageData, element) {
             <div class="catalog-chip-row">${relatedTopics.map(topicChip).join('')}</div>
           </section>
 
+          ${journeyContinuationCard(journeyState, object)}
           <section class="reading-surface reveal-on-scroll is-visible">
             <p class="section-kicker">What We Learn from Its Light</p>
             <h2>Light turns appearance into evidence</h2>
@@ -470,6 +554,7 @@ export function renderObjectPage(pageData, element) {
             </div>
           </section>
 
+          ${spectralClassComparison(object)}
           <section class="reading-surface reveal-on-scroll is-visible">
             <p class="section-kicker">How It Fits in the Universe</p>
             <h2>Context matters as much as appearance</h2>
@@ -505,6 +590,7 @@ export function renderObjectPage(pageData, element) {
                   <h3>${item.title}</h3>
                   <p>${item.description}</p>
                   <a class="text-link" href="${item.href}">${item.label}</a>
+                  <a class="text-link" href="${toAbsolutePath(`pages/observatory.html?object=${item.id}&from=object-page`)}">Open in Observatory Mode</a>
                 </article>
               `).join('')}
             </div>
@@ -518,6 +604,7 @@ export function renderObjectPage(pageData, element) {
                   <h3>${related.name}</h3>
                   <p>${related.angularDistance}. ${related.summary}</p>
                   <a class="text-link" href="${objectLink(related)}">Open object page</a>
+                  <a class="text-link" href="${toAbsolutePath(`pages/observatory.html?object=${related.id}&from=related-objects`)}">Open in Observatory Mode</a>
                 </article>
               `).join('')}
             </div>
