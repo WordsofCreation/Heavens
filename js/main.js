@@ -11,12 +11,15 @@ import {
   renderFeaturedRegions,
   renderObjectPage,
   renderDiscoverPage,
-  renderLearnPage
+  renderLearnPage,
+  renderObservatoryPage,
+  renderHomepageExperience
 } from './star-renderer.js';
 import { getAstronomyObjects, getObjectById, getFeaturedRegions, findRelatedObjects, getObjectPageData } from './services/object-service.js';
 import { getFutureIntegrationStatus, getProgressiveObjectSummary } from './services/external-data-service.js';
 import { createSkyViewer, focusObject, toggleViewerGrid } from './services/sky-viewer-service.js';
 import { getDiscoverModules, getLearningPaths, getScienceTopics, getStartHereGuide } from './services/science-content-service.js';
+import { getObservatoryData } from './services/observatory-service.js';
 import { toAbsolutePath } from './path-utils.js';
 
 setupNavigation();
@@ -229,6 +232,241 @@ async function initSkyViewer(objects) {
   }
 }
 
+
+async function initObservatory() {
+  const target = document.getElementById('observatory-app');
+  if (!target) return;
+
+  const observatoryData = await getObservatoryData();
+  renderObservatoryPage(observatoryData, target);
+
+  const params = new URLSearchParams(window.location.search);
+  const canvas = document.getElementById('observatory-canvas');
+  const hotspots = document.getElementById('observatory-hotspots');
+  const filterGroup = document.getElementById('observatory-filter-group');
+  const objectPanel = document.getElementById('observatory-object-panel');
+  const objectLink = document.getElementById('observatory-object-link');
+  const journeyPanel = document.getElementById('observatory-journey-panel');
+  const statusTitle = document.getElementById('observatory-status-title');
+  const statusCopy = document.getElementById('observatory-status-copy');
+
+  if (!canvas || !hotspots || !filterGroup || !objectPanel || !journeyPanel) return;
+
+  const ctx = canvas.getContext('2d');
+  const { skyNodes, journeys, regions, storyPanels } = observatoryData;
+  let activeJourney = journeys.find((journey) => journey.id === params.get('journey')) || journeys[0];
+  let activeFilter = 'all';
+  let activeObject = skyNodes.find((object) => object.id === params.get('object')) || activeJourney.objects[0] || skyNodes[0];
+  let animationFrame = null;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const camera = { x: activeObject.x, y: activeObject.y, scale: 1.08 };
+  const targetCamera = { x: activeObject.x, y: activeObject.y, scale: 1.08 };
+
+  const colorMap = (object) => object.color?.includes('red') ? '#ff9d7f' : object.color?.includes('yellow') || object.color?.includes('gold') || object.color?.includes('orange') ? '#f3d18c' : object.color?.includes('blue') ? '#8fb0ff' : '#edf2ff';
+  const distanceFill = (distance) => `${Math.max(14, Math.min(100, Math.log10((distance || 1) + 1) * 24))}%`;
+
+  const syncUrl = () => {
+    const next = new URLSearchParams();
+    if (activeObject?.id) next.set('object', activeObject.id);
+    if (activeJourney?.id) next.set('journey', activeJourney.id);
+    if (activeFilter !== 'all') next.set('filter', activeFilter);
+    window.history.replaceState({}, '', `${window.location.pathname}?${next.toString()}`);
+  };
+
+  const visibleNodes = () => {
+    if (activeFilter === 'favorites') return skyNodes.filter((object) => activeJourney.objectIds.includes(object.id));
+    if (activeFilter === 'naked-eye') return skyNodes.filter((object) => ['sirius','betelgeuse','rigel','vega','polaris','pleiades','andromeda-galaxy','aldebaran','arcturus'].includes(object.id));
+    if (activeFilter === 'by-color') return skyNodes.filter((object) => object.temperatureK || object.color);
+    return skyNodes;
+  };
+
+  const renderFilters = () => {
+    const filters = [
+      { id: 'all', label: 'All highlights' },
+      { id: 'favorites', label: 'Tonight's Journey' },
+      { id: 'naked-eye', label: 'Naked-eye favorites' },
+      { id: 'by-color', label: 'Explore by color' }
+    ];
+    filterGroup.innerHTML = filters.map((filter) => `<button type="button" class="filter-chip${filter.id === activeFilter ? ' is-selected' : ''}" data-filter-id="${filter.id}">${filter.label}</button>`).join('');
+    filterGroup.querySelectorAll('[data-filter-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        activeFilter = button.dataset.filterId;
+        renderFilters();
+        renderHotspots();
+        syncUrl();
+      });
+    });
+  };
+
+  const renderHotspots = () => {
+    hotspots.innerHTML = visibleNodes().map((object) => `<button type="button" class="observatory-hotspot${object.id === activeObject.id ? ' is-active' : ''}" style="left:${object.x}%;top:${object.y}%;--glow:${colorMap(object)}" data-object-id="${object.id}"><span class="sr-only">Focus ${object.name}</span><span class="observatory-hotspot-dot"></span><span class="observatory-hotspot-label">${object.name}</span></button>`).join('');
+    hotspots.querySelectorAll('[data-object-id]').forEach((button) => button.addEventListener('click', () => {
+      const match = skyNodes.find((object) => object.id === button.dataset.objectId);
+      if (match) selectObject(match);
+    }));
+  };
+
+  const renderObjectPanel = (object) => {
+    const region = regions.find((item) => item.objectIds.includes(object.id));
+    const relatedTopics = (object.relatedTopicCards || []).slice(0, 3).map((topic) => `<a class="tag tag-link" href="${toAbsolutePath(topic.pageHref)}">${topic.title}</a>`).join('');
+    const fame = object.apparentMagnitude <= 1 ? 'Headline sky object' : object.distanceLightYears > 100000 ? 'Cosmic scale landmark' : 'Guided observatory target';
+    objectPanel.innerHTML = `
+      <div class="observatory-object-card">
+        <div class="observatory-object-topline">
+          <span class="temp-swatch" style="--object-color:${colorMap(object)}"></span>
+          <div>
+            <h3>${object.name}</h3>
+            <p>${object.type}</p>
+          </div>
+        </div>
+        <div class="catalog-meta">
+          <span class="tag">${object.constellation}</span>
+          <span>${object.distance}</span>
+          <span>${object.spectralClass}</span>
+        </div>
+        <div class="observatory-badge-row">
+          <span class="tag">${fame}</span>
+          <span class="tag">${region ? region.name : 'Sky highlight'}</span>
+        </div>
+        <p>${object.summary}</p>
+        <div class="detail-list observatory-detail-list">
+          <div><strong>Constellation</strong><p>${object.constellation}</p></div>
+          <div><strong>Distance</strong><p>${object.distance}</p></div>
+          <div><strong>Spectral class</strong><p>${object.spectralClass}</p></div>
+          <div><strong>Color note</strong><p>${object.color}</p></div>
+          <div><strong>Temperature</strong><p>${object.temperatureK ? object.temperatureK.toLocaleString() + ' K' : 'Interpreted from emitted gas and stellar mix'}</p></div>
+          <div><strong>Why it matters</strong><p>${object.importance}</p></div>
+        </div>
+        <div class="distance-meter"><div class="distance-meter-bar"><span style="width:${distanceFill(object.distanceLightYears)}"></span></div><small>Distance scale in the observatory collection</small></div>
+        <section class="mini-panel nested-panel"><h3>What its light reveals</h3><p>${object.lightStory}</p></section>
+        <section class="mini-panel nested-panel"><h3>Related science topics</h3><div class="catalog-chip-row">${relatedTopics}</div></section>
+      </div>`;
+    objectLink.href = toAbsolutePath(`pages/objects/${object.id}.html`);
+    statusTitle.textContent = object.name;
+    statusCopy.textContent = `${object.skyGuide} ${region ? region.note : ''}`;
+  };
+
+  const renderJourneyPanel = () => {
+    journeyPanel.innerHTML = `
+      <article class="journey-panel" style="background:${activeJourney.accent}">
+        <p class="section-kicker">${activeJourney.eyebrow}</p>
+        <h3>${activeJourney.title}</h3>
+        <p>${activeJourney.description}</p>
+        <ol class="journey-step-list">${activeJourney.steps.map((step) => `<li>${step}</li>`).join('')}</ol>
+        <div class="catalog-chip-row">${activeJourney.objects.map((object) => `<button type="button" class="tag tag-button" data-journey-object="${object.id}">${object.name}</button>`).join('')}</div>
+      </article>
+      <article class="mini-panel nested-panel"><h3>Story prompt</h3><p>${storyPanels.find((panel) => activeJourney.title.toLowerCase().includes('light') ? panel.id === 'light-knowledge' : activeJourney.title.toLowerCase().includes('color') ? panel.id === 'star-colors' : panel.id === 'eyes-seeing')?.body}</p></article>`;
+    journeyPanel.querySelectorAll('[data-journey-object]').forEach((button) => button.addEventListener('click', () => {
+      const match = skyNodes.find((object) => object.id === button.dataset.journeyObject);
+      if (match) selectObject(match, false);
+    }));
+    document.querySelectorAll('[data-journey-id]').forEach((button) => button.classList.toggle('is-selected', button.dataset.journeyId === activeJourney.id));
+  };
+
+  const selectObject = (object, updateJourney = true) => {
+    activeObject = object;
+    if (updateJourney) {
+      const containingJourney = journeys.find((journey) => journey.objectIds.includes(object.id));
+      if (containingJourney) activeJourney = containingJourney;
+    }
+    targetCamera.x = object.x;
+    targetCamera.y = object.y;
+    targetCamera.scale = 1.18;
+    renderHotspots();
+    renderObjectPanel(object);
+    renderJourneyPanel();
+    syncUrl();
+  };
+
+  const draw = () => {
+    const width = canvas.clientWidth || canvas.width;
+    const height = canvas.clientHeight || canvas.height;
+    if (canvas.width !== width * devicePixelRatio || canvas.height !== height * devicePixelRatio) {
+      canvas.width = width * devicePixelRatio;
+      canvas.height = height * devicePixelRatio;
+    }
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    if (!prefersReducedMotion) {
+      camera.x += (targetCamera.x - camera.x) * 0.055;
+      camera.y += (targetCamera.y - camera.y) * 0.055;
+      camera.scale += (targetCamera.scale - camera.scale) * 0.04;
+    } else {
+      camera.x = targetCamera.x;
+      camera.y = targetCamera.y;
+      camera.scale = targetCamera.scale;
+    }
+
+    const gradient = ctx.createRadialGradient(width * 0.52, height * 0.46, 20, width * 0.52, height * 0.46, width * 0.8);
+    gradient.addColorStop(0, 'rgba(54, 84, 170, 0.22)');
+    gradient.addColorStop(0.5, 'rgba(17, 27, 59, 0.16)');
+    gradient.addColorStop(1, 'rgba(2, 6, 18, 0.94)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    for (let i = 0; i < 140; i += 1) {
+      const x = ((i * 79) % width);
+      const y = ((i * 43) % height);
+      const twinkle = prefersReducedMotion ? 0.7 : 0.55 + Math.sin((performance.now() * 0.0012) + i) * 0.18;
+      ctx.fillStyle = `rgba(255,255,255,${twinkle})`;
+      ctx.beginPath();
+      ctx.arc(x, y, (i % 3) + 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const nodes = visibleNodes();
+    nodes.forEach((node) => {
+      const px = ((node.x - camera.x) * camera.scale + 50) / 100 * width;
+      const py = ((node.y - camera.y) * camera.scale + 50) / 100 * height;
+      if (px < -50 || py < -50 || px > width + 50 || py > height + 50) return;
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, 38);
+      glow.addColorStop(0, colorMap(node));
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(px, py, 38, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(px, py, node.id === activeObject.id ? node.size + 2 : node.size, 0, Math.PI * 2);
+      ctx.fill();
+      if (node.regionId && node.id !== activeObject.id) {
+        ctx.strokeStyle = 'rgba(135,171,255,0.18)';
+        ctx.beginPath();
+        ctx.arc(px, py, 12 + node.size, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    });
+
+    animationFrame = requestAnimationFrame(draw);
+  };
+
+  renderFilters();
+  renderHotspots();
+  renderObjectPanel(activeObject);
+  renderJourneyPanel();
+
+  document.querySelectorAll('[data-journey-id]').forEach((button) => button.addEventListener('click', () => {
+    const journey = journeys.find((item) => item.id === button.dataset.journeyId);
+    if (!journey) return;
+    activeJourney = journey;
+    activeFilter = 'favorites';
+    renderFilters();
+    renderJourneyPanel();
+    renderHotspots();
+    if (journey.objects[0]) selectObject(journey.objects[0], false);
+  }));
+
+  document.querySelectorAll('[data-region-object]').forEach((button) => button.addEventListener('click', () => {
+    const object = skyNodes.find((item) => item.id === button.dataset.regionObject);
+    if (object) selectObject(object);
+  }));
+
+  draw();
+  window.addEventListener('beforeunload', () => animationFrame && cancelAnimationFrame(animationFrame), { once: true });
+}
+
 async function initObjectPage() {
   const target = document.getElementById('object-page-content');
   const objectId = document.body.dataset.objectId;
@@ -262,12 +500,14 @@ async function initLearnPage(objects) {
 async function init() {
   const objects = await getAstronomyObjects();
   renderFeaturedObject(objects);
+  renderHomepageExperience(objects);
 
   if (page === 'explore') await initExplore(objects);
   if (page === 'sky-viewer') await initSkyViewer(objects);
   if (page === 'object-detail') await initObjectPage();
   if (page === 'discover') await initDiscoverPage(objects);
   if (page === 'learn') await initLearnPage(objects);
+  if (page === 'observatory') await initObservatory();
 }
 
 init().catch((error) => {

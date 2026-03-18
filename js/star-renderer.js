@@ -625,3 +625,124 @@ export function renderLearnPage({ paths, topics, startHere, objects }, element) 
     </section>
   `;
 }
+
+export function renderHomepageExperience(objects) {
+  const preview = document.querySelector('[data-home-observatory]');
+  if (!preview || !objects?.length) return;
+  const sample = ['sirius', 'betelgeuse', 'vega', 'polaris']
+    .map((id) => objects.find((object) => object.id === id))
+    .filter(Boolean)
+    .map((object) => `<li><strong>${object.name}</strong> · ${object.constellation} · ${object.type}</li>`)
+    .join('');
+  preview.innerHTML = `<ul class="observatory-mini-list">${sample}</ul>`;
+}
+
+export function renderObservatoryPage({ skyNodes, journeys, regions, storyPanels, tonightJourney }, element) {
+  const initial = skyNodes[0];
+  element.innerHTML = `
+    <section class="observatory-hero hero cosmic-sky">
+      <div class="container observatory-hero-grid reveal-on-scroll is-visible">
+        <div>
+          <p class="eyebrow">Observatory Mode</p>
+          <h1>Stand beneath a stylized night sky and let science unfold through guided discovery.</h1>
+          <p class="hero-text">Observatory Mode is Heavens' flagship immersive experience: a lightweight canvas sky, elegant overlays, curated journeys, and object focus panels designed to feel premium, calm, and educational.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#observatory-sky">Start in the sky</a>
+            <a class="button button-secondary" href="sky-viewer.html">Open the real-sky viewer</a>
+          </div>
+          <div class="observatory-hero-notes" data-home-observatory>
+            <ul class="observatory-mini-list">
+              <li>Preparing landmark objects...</li>
+            </ul>
+          </div>
+        </div>
+        <aside class="observatory-side-panel orbital-panel">
+          <p class="section-kicker">Tonight's Journey</p>
+          <h2>${tonightJourney.title}</h2>
+          <p>${tonightJourney.description}</p>
+          <ol class="journey-step-list">
+            ${tonightJourney.steps.map((step) => `<li>${step}</li>`).join('')}
+          </ol>
+          <a class="text-link" href="#observatory-journeys">Follow this route</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section observatory-surface-section" id="observatory-sky">
+      <div class="container observatory-shell reveal-on-scroll is-visible">
+        <div class="observatory-stage">
+          <canvas id="observatory-canvas" class="observatory-canvas" width="1400" height="760" aria-hidden="true"></canvas>
+          <div class="observatory-hud">
+            <div class="observatory-chip-row" id="observatory-filter-group" aria-label="Observatory filters"></div>
+            <div class="observatory-hotspots" id="observatory-hotspots" aria-label="Highlighted objects"></div>
+          </div>
+          <div class="observatory-status-panel mini-panel">
+            <p class="section-kicker">Night sky experience</p>
+            <h2 id="observatory-status-title">${initial.name}</h2>
+            <p id="observatory-status-copy">Select a hotspot, constellation, or guided journey to gently refocus the observatory around a famous object.</p>
+          </div>
+        </div>
+        <aside class="observatory-sidebar">
+          <article class="mini-panel observatory-panel-block">
+            <div class="section-heading-row compact-heading">
+              <div>
+                <p class="section-kicker">Object Focus</p>
+                <h2>Selected object</h2>
+              </div>
+              <a class="text-link" id="observatory-object-link" href="${objectLink(initial)}">Full page</a>
+            </div>
+            <div id="observatory-object-panel"></div>
+          </article>
+          <article class="mini-panel observatory-panel-block" id="observatory-journeys">
+            <p class="section-kicker">Guided Discovery</p>
+            <h2>Choose a journey</h2>
+            <div class="journey-list" id="observatory-journey-list">
+              ${journeys.map((journey) => `<button class="journey-button" type="button" data-journey-id="${journey.id}"><span>${journey.title}</span><small>${journey.theme}</small></button>`).join('')}
+            </div>
+            <div id="observatory-journey-panel"></div>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal-on-scroll is-visible">
+          <div>
+            <p class="section-kicker">Science storytelling</p>
+            <h2>Wonder first, then the method behind the wonder.</h2>
+          </div>
+          <p>These reusable panels keep the scientific meaning close to the interface so the observatory feels welcoming rather than technical.</p>
+        </div>
+        <div class="card-grid three-up compact-grid reveal-on-scroll is-visible">
+          ${storyPanels.map((panel) => `<article class="science-callout story-panel"><p class="eyebrow">${panel.kicker}</p><h2>${panel.title}</h2><p>${panel.body}</p></article>`).join('')}
+        </div>
+      </div>
+    </section>
+
+    <section class="section constellation-section">
+      <div class="container">
+        <div class="section-head reveal-on-scroll is-visible">
+          <div>
+            <p class="section-kicker">Constellation and sky regions</p>
+            <h2>Use memorable sky neighborhoods to organize discovery.</h2>
+          </div>
+          <p>Each region groups notable objects with short scientific and cultural notes so the sky stays readable and human-scaled.</p>
+        </div>
+        <div class="card-grid two-up reveal-on-scroll is-visible">
+          ${regions.map((region) => `
+            <article class="feature-card constellation-card">
+              <p class="section-kicker">${region.name}</p>
+              <h2>${region.title}</h2>
+              <p>${region.note}</p>
+              <p class="home-feature-note">${region.cultural}</p>
+              <div class="catalog-chip-row">
+                ${region.objects.map((object) => `<button type="button" class="tag tag-button" data-region-object="${object.id}">${object.name}</button>`).join('')}
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
